@@ -119,6 +119,48 @@ SPDX-License-Identifier: MIT
 
 <h2 id="status">Status</h2>
 
+<h2 id="toc">Table of contents</h2>
+<ul>
+  <li><a href="#abstract">¶ Abstract</a></li>
+  <li><a href="#issues">¶ Issues</a></li>
+  <li><a href="#rationale">¶ Rationale</a></li>
+  <li>
+    <a href="#specification">¶Specification</a>
+    <ul>
+      <li><a href="#default-behavior">¶ Default behavior of decoders</a></li>
+      <li><a href="#convention">¶ Conventions</a></li>
+      <li><a href="#optional-required">¶ Optional and required features</a></li>
+      <li><a href="#composite-library">¶ Composite library</a></li>
+      <li><a href="#base-library">¶ Base library</a></li>
+      <li><a href="#endianness-library">¶ Endianness library</a></li>
+      <li><a href="#serialization-library">¶ Serialization library</a></li>
+      <li><a href="#u8-library">¶ 8-bit integer libraries</a></li>
+      <li><a href="#arbitrary-precision-library">¶ Arbitrary precision library</a></li>
+      <li><a href="#multibyte-libraries">¶ Multibyte libraries</a></li>
+      <li>
+        <a href="##floating-point-libraries">¶ Floating-point libraries</a>
+        <ul>
+          <li><a href="#binary32">¶ Binary32 library</a></li>
+          <li><a href="#binary64">¶ Binary64 library</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#unicode-libraries">¶ Unicode libraries</a>
+        <ul>
+          <li><a href="#error-handling-mode-section">¶ Error handling mode macro</a></li>
+          <li><a href="#encoding-procedures">¶ Encoding procedures</a></li>
+          <li><a href="#decoding-procedures">¶ Decoding procedures</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#implementation">¶ Implementation</a></li>
+  <li><a href="#acknowledgements">¶ Acknowledgements</a></li>
+  <li><a href="#appendix-1">¶ Appendix 1:
+Library summaries</a></li>
+  <li><a href="#copyright">¶ Copyright</a></li>
+</ul>
+
 <h2 id="abstract"><a href="#abstract">&para;</a> Abstract</h2>
 
 <p>
@@ -1352,7 +1394,7 @@ BOM in the encoding is decoded as a regular character.
   this SRFI.
 </p>
 
-<h2 id="appendix-1"><a href="#appendix-1">&para;</a> Appendix 1:
+<h2 id="appendix-1" data-toc><a href="#appendix-1">&para;</a> Appendix 1:
 Library summaries</h2>
 
 <p>Entries with a superscript 7 are procedures reexported from
@@ -1362,7 +1404,7 @@ Library summaries</h2>
    procedure, usually with the same name.
 </p>
 
-<h3><code>(srfi 281 base)</code></h3>
+<h3 id="srfi-281-base"><code>(srfi 281 base)</code></h3>
 <p class="never-break-inside">
 <code><a href="#endiannessp">endianness?</a></code>
 <code><a href="#native-endianness">native-endianness</a></code><sup>6</sup>
@@ -1374,12 +1416,12 @@ Library summaries</h2>
 <code>bytevector-copy</code><sup>7</sup>
 </p>
 
-<h3><code>(srfi 281 endianness)</code></h3>
+<h3 id="srfi-281-endianness"><code>(srfi 281 endianness)</code></h3>
 <p class="never-break-inside">
 <code><a href="#endianness">endianness</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 serialization)</code></h3>
+<h3 id="srfi-281-serialization"><code>(srfi 281 serialization)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-to-hex-string">bytevector-&gt;hex-string</a></code>
 <code><a href="#hex-string-to-bytevector">hex-string-&gt;bytevector></a></code>
@@ -1387,7 +1429,7 @@ Library summaries</h2>
 <code><a href="#base64-to-bytevector">base64-&gt;bytevector</a></code>
 </p>
 
-<h3><code>(srfi 281 u8)</code></h3>
+<h3 id="srfi-281-u8"><code>(srfi 281 u8)</code></h3>
 <p class="never-break-inside">
 <code>bytevector-u8-ref</code><sup>6,7</sup>
 <code>bytevector-u8-set!</code><sup>6,7</sup>
@@ -1395,13 +1437,13 @@ Library summaries</h2>
 <code><a href="#bytevector-to-u8-list">bytevector-&gt;u8-list</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 s8)</code></h3>
+<h3 id="srfi-281-s8"><code>(srfi 281 s8)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-u8-ref">bytevector-s8-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-u8-set">bytevector-s8-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 int)</code></h3>
+<h3 id="srfi-281-int"><code>(srfi 281 int)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-uint-ref">bytevector-uint-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-uint-set">bytevector-uint-set!</a></code><sup>6</sup>
@@ -1413,7 +1455,7 @@ Library summaries</h2>
 <code><a href="#sint-list-to-bytevector">sint-list-&gt;bytevector</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 u16)</code></h3>
+<h3 id="srfi-281-u16"><code>(srfi 281 u16)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-u16-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-u16-native-ref</a></code><sup>6</sup>
@@ -1421,7 +1463,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-u16-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 s16)</code></h3>
+<h3 id="srfi-281-s16"><code>(srfi 281 s16)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-s16-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-s16-native-ref</a></code><sup>6</sup>
@@ -1429,7 +1471,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-s16-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 u32)</code></h3>
+<h3 id="srfi-281-u32"><code>(srfi 281 u32)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-u32-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-u32-native-ref</a></code><sup>6</sup>
@@ -1437,7 +1479,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-u32-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 s32)</code></h3>
+<h3 id="srfi-281-s32"><code>(srfi 281 s32)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-s32-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-s32-native-ref</a></code><sup>6</sup>
@@ -1445,7 +1487,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-s32-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 u64)</code></h3>
+<h3 id="srfi-281-u64"><code>(srfi 281 u64)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-u64-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-u64-native-ref</a></code><sup>6</sup>
@@ -1453,7 +1495,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-u64-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 s64)</code></h3>
+<h3 id="srfi-281-s64"><code>(srfi 281 s64)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-s64-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-s64-native-ref</a></code><sup>6</sup>
@@ -1461,7 +1503,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-s64-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 f32)</code></h3>
+<h3 id="srfi-281-f32"><code>(srfi 281 f32)</code></h3>
 <p class="never-break-inside">
 
 <code><a href="#bytevector-binary32-ref">bytevector-binary32-ref</a></code><sup>6</sup>
@@ -1474,7 +1516,7 @@ Library summaries</h2>
 <code><a href="#bytevector-ieee-single-native-set">bytevector-ieee-single-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 f64)</code></h3>
+<h3 id="srfi-281-f64"><code>(srfi 281 f64)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-binary64-ref">bytevector-binary64-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-ieee-double-ref">bytevector-ieee-double-ref</a></code><sup>6</sup>
@@ -1486,12 +1528,12 @@ Library summaries</h2>
 <code><a href="#bytevector-ieee-double-native-set">bytevector-ieee-double-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 error-handling-mode)</code></h3>
+<h3 id="srfi-281-error-handling-mode"><code>(srfi 281 error-handling-mode)</code></h3>
 <p class="never-break-inside">
 <code><a href="#error-handling-mode">error-handling-mode</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi 281 unicode)</code></h3>
+<h3 id="srfi-281-unicode"><code>(srfi 281 unicode)</code></h3>
 <p class="never-break-inside">
 <code><a href="#error-handling-modep">error-handling-mode?</a></code>
 <code><a href="#i-o-decoding-errorp">i/o-decoding-error?</a></code><sup>6</sup>
