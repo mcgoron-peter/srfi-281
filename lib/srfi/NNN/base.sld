@@ -1,0 +1,18 @@
+(define-library (srfi NNN base)
+  (import (rename (scheme base) (make-bytevector r7rs:make-bytevector))
+          (srfi 143)
+          (scheme case-lambda))
+  (export endianness? native-endianness
+          make-bytevector
+          bytevector=? bytevector<? bytevector<=?
+          bytevector>? bytevector>=?
+          bytevector-fill!
+          bytevector? bytevector-length bytevector-copy)
+  (cond-expand
+    (little-endian
+     (begin (define (native-endianness) 'little)))
+    (big-endian
+     (begin (define (native-endianness) 'big)))
+    (else (begin (error "I don't know the native endianness"))))
+  (include-library-declarations "internal.scm")
+  (include "base.scm"))
