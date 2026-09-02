@@ -394,7 +394,7 @@
 (define (read-21-bits bv i endianness)
   ;; Read 21 bits, which will fit in the minimum fixnum width.
   (cond-expand
-    ((library (srfi NNN u32))
+    ((library (srfi 281 u32))
      (bytevector-u32-ref bv i endianness))
     (else
      (case endianness
@@ -536,7 +536,7 @@
                 (error "lone surrogate" c))
                (else
                 (cond-expand
-                  ((library (srfi NNN u32))
+                  ((library (srfi 281 u32))
                    (bytevector-u32-set! scratch 0 c endianness)
                    (write-u8 (bytevector-u8-ref scratch 0) port)
                    (write-u8 (bytevector-u8-ref scratch 1) port)

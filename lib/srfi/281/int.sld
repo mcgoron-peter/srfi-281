@@ -1,4 +1,4 @@
-(define-library (srfi NNN int)
+(define-library (srfi 281 int)
   (export bytevector-uint-ref bytevector-uint-set!
           bytevector-sint-ref bytevector-sint-set!
           uint-list->bytevector bytevector->uint-list
@@ -12,7 +12,7 @@
                    bytevector-sint-set!)))
     (else (import (except (scheme base) make-bytevector)
                   (scheme case-lambda)
-                  (srfi NNN base))
+                  (srfi 281 base))
           (include-library-declarations "internal.scm")
           (include-library-declarations "internal-fixed.scm")
           (include "int.scm"))))

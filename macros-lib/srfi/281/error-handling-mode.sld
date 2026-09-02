@@ -1,4 +1,4 @@
-(define-library (srfi NNN endianness)
+(define-library (srfi 281 error-handling-mode)
   (cond-expand
     (chicken
      (import (scheme base)
@@ -12,16 +12,16 @@
     (gauche (import (scheme base) (gauche base)))
     (gambit (import (gambit)))
     ((library (rnrs bytevectors)) (import (rnrs bytevectors))))
-  (export endianness)
+  (export error-handling-mode)
   (cond-expand
     ((or chicken mit chibi gauche)
      (begin
-       (define-syntax endianness
+       (define-syntax error-handling-mode
          (er-macro-transformer
           (lambda (exp rename compare)
             (unless (and (list? exp)
                          (= (length exp) 2))
-              (error "syntax: (endianness symbol)" exp))
+              (error "syntax: (error-handling-mode symbol)" exp))
             (let ((sym (cadr exp)))
               (unless (symbol? sym)
                 (error "not a symbol" sym))
@@ -30,32 +30,17 @@
               ;; string.
               (let ((str (symbol->string sym)))
                 (cond
-                  ((string=? str "little") `(,(rename 'quote) little))
-                  ((string=? str "big") `(,(rename 'quote) big))
-                  (else (error "invalid endianness" sym))))))))))
+                  ((member str '("raise" "replace" "ignore"))
+                   `(,(rename 'quote) ,sym))
+                  (else (error "invalid error-handling-mode" sym))))))))))
     (gambit
      (begin
-       (define-macro (endianness symbol)
+       (define-macro (error-handling-mode symbol)
          (unless (symbol? symbol)
            (error "not a symbol" symbol))
          (let (str (symbol->string symbol))
            (cond
-             ((string=? str "little") `(quote little))
-             ((string=? str "big") `(quote big))
-             (else (error "invalid endianness" symbol)))))))
-    #|
-(has-syntax-case
-     (define-syntax endianness
-       (lambda (x)
-         (syntax-case x ()
-           ((_ sym)
-            (identifier? sym)
-            (let ((sym (syntax->datum sym)))
-              (case sym
-                ((little big) #'(quote sym))
-                (else (syntax-violation 'endianness
-                                        "not an endianness"
-                                        x
-                                        sym)))))))))
-|#
+             ((member str '("raise" "replace" "ignore"))
+              `(quote ,symbol))
+             (else (error "invalid error-handling-mode" symbol)))))))
     (else)))

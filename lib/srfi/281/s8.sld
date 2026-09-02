@@ -1,4 +1,4 @@
-(define-library (srfi NNN s8)
+(define-library (srfi 281 s8)
   (import (scheme base))
   (export bytevector-s8-ref bytevector-s8-set!)
   (cond-expand

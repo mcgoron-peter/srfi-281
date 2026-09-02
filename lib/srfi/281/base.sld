@@ -1,4 +1,4 @@
-(define-library (srfi NNN base)
+(define-library (srfi 281 base)
   (import (rename (scheme base) (make-bytevector r7rs:make-bytevector))
           (srfi 143)
           (scheme case-lambda))

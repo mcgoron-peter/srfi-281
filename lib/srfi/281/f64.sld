@@ -1,24 +1,24 @@
-(define-library (srfi NNN f32)
+(define-library (srfi 281 f64)
   (import (scheme base)
           (scheme inexact)
-          (only (srfi NNN base)
+          (only (srfi 281 base)
                 endianness?
                 native-endianness
                 bytevector-fill!)
           (srfi 143)
-          (srfi NNN internal-flonum)
-          (srfi NNN u32))
-  (export bytevector-binary32-set!
-          (rename bytevector-binary32-set!
+          (srfi 281 internal-flonum)
+          (srfi 281 u64))
+  (export bytevector-binary64-set!
+          (rename bytevector-binary64-set!
                   bytevector-ieee-single-set!)
-          bytevector-binary32-ref
-          (rename bytevector-binary32-ref
+          bytevector-binary64-ref
+          (rename bytevector-binary64-ref
                   bytevector-ieee-single-ref)
-          bytevector-binary32-native-set!
-          (rename bytevector-binary32-native-set!
+          bytevector-binary64-native-set!
+          (rename bytevector-binary64-native-set!
                   bytevector-ieee-single-native-set!)
-          bytevector-binary32-native-ref
-          (rename bytevector-binary32-native-ref
+          bytevector-binary64-native-ref
+          (rename bytevector-binary64-native-ref
                   bytevector-ieee-single-native-ref))
   (cond-expand
     ((library (srfi 208))
@@ -35,4 +35,4 @@
               (at at (+ at 1)))
              ((negative? i))
            (bytevector-u8-set! to at (bytevector-u8-ref from i)))))))
-  (include "f32.scm"))
+  (include "f64.scm"))

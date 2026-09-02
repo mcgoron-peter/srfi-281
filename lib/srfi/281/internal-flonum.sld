@@ -1,7 +1,7 @@
-(define-library (srfi NNN internal-flonum)
+(define-library (srfi 281 internal-flonum)
   (import (scheme base) (scheme case-lambda)
           (srfi 143)
-          (only (srfi NNN base) endianness?))
+          (only (srfi 281 base) endianness?))
   (export convert-to-representation sign-negative? bits->flonum)
   (cond-expand
     ((library (srfi 1))

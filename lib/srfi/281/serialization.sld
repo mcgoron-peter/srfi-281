@@ -1,4 +1,4 @@
-(define-library (srfi NNN serialization)
+(define-library (srfi 281 serialization)
   (import (scheme base) (scheme case-lambda))
   (export bytevector->hex-string
           hex-string->bytevector

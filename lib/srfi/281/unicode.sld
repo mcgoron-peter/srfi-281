@@ -1,14 +1,14 @@
-(define-library (srfi NNN unicode)
+(define-library (srfi 281 unicode)
   (import (scheme base) (scheme case-lambda) (srfi 143)
-          (only (srfi NNN base) endianness?)
-          (srfi NNN u16))
+          (only (srfi 281 base) endianness?)
+          (srfi 281 u16))
   (export error-handling-mode?
           i/o-decoding-error?
           string->utf8 string->utf16 string->utf32
           utf8->string utf16->string utf32->string)
   (cond-expand
-    ((library (srfi NNN u32))
-     (import (srfi NNN u32)))
+    ((library (srfi 281 u32))
+     (import (srfi 281 u32)))
     (else))
   (cond-expand
     ((library (rnrs io ports))

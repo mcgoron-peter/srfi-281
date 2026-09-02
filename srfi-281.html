@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 -->
   <head>
     <meta charset="utf-8">
-    <title>SRFI NNN: Bytevector Utilities</title>
+    <title>SRFI 281: Bytevector Utilities</title>
     <style>
             table {
               border: 1px solid;
@@ -113,7 +113,7 @@ SPDX-License-Identifier: MIT
         ><img class="srfi-logo"
               src="https://srfi.schemers.org/srfi-logo.svg"
               alt="SRFI surfboard logo"
-        /></a>NNN: Bytevector Utilities</h1>
+        /></a>281: Bytevector Utilities</h1>
 
 <p>by Peter McGoron</p>
 
@@ -324,21 +324,21 @@ SPDX-License-Identifier: MIT
 <h2 id="optional-required"><a href="#optional-required">&para;</a> Optional and required features</h2>
 
 <p>
-  The libraries <a href="#composite-library"><code>(srfi NNN)</code></a>,
-  <a href="#base-library"><code>(srfi NNN base)</code></a>,
-  <a href="#serialization-library"><code>(srfi NNN serialization)</code></a>,
+  The libraries <a href="#composite-library"><code>(srfi 281)</code></a>,
+  <a href="#base-library"><code>(srfi 281 base)</code></a>,
+  <a href="#serialization-library"><code>(srfi 281 serialization)</code></a>,
   and
-  <a href="#u8-library"><code>(srfi NNN u8)</code></a> must be supported.
+  <a href="#u8-library"><code>(srfi 281 u8)</code></a> must be supported.
 </p>
 
 <p>
-  The integer libraries <code>(srfi NNN s8)</code>, <code>(srfi NNN u16)</code>,
+  The integer libraries <code>(srfi 281 s8)</code>, <code>(srfi 281 u16)</code>,
   etc. are only exported if the implementation supports exact integer objects
-  of those sizes. The library <code>(srfi NNN int)</code> is only exported
+  of those sizes. The library <code>(srfi 281 int)</code> is only exported
   if the implementation supports exact integer objects of arbitrary size.
-  The <code>(srfi NNN f32)</code> and <code>(srfi NNN f64)</code> libraries
+  The <code>(srfi 281 f32)</code> and <code>(srfi 281 f64)</code> libraries
   are only exported if the implementation supports inexact real numbers.
-  The <code>(srfi NNN unicode)</code> is only exported if the implementation
+  The <code>(srfi 281 unicode)</code> is only exported if the implementation
   supports all of the Unicode scalar values as characters.
 </p>
 
@@ -354,7 +354,7 @@ SPDX-License-Identifier: MIT
 
 <h2 id="composite-library"><a href="#composite-library">&para;</a> Composite library</h2>
 
-<p>The library <code>(srfi NNN)</code> exports all identifiers defined
+<p>The library <code>(srfi 281)</code> exports all identifiers defined
    below that are supported by the implementation. For example, if an
    implementation does not support
    <code><a href="#endianness">endianness</a></code>, then the base
@@ -364,14 +364,14 @@ SPDX-License-Identifier: MIT
 <h2 id="base-library"><a href="#base-library">&para;</a> Base library</h2>
 
 <p>
-  The library <code>(srfi NNN base)</code> exports
+  The library <code>(srfi 281 base)</code> exports
   the <span class="report-name">R<sup>7</sup>RS</span> procedures
   <code>bytevector?</code>, <code>bytevector-length</code>, and
   <code>bytevector-copy</code>.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN base)<br>procedure</span>
+<span class="category">(srfi 281 base)<br>procedure</span>
 <code class="signature">(<a id="endiannessp" href="#endiannessp">endianness?</a> <var>obj</var>)</code>
 </div>
 
@@ -393,7 +393,7 @@ SPDX-License-Identifier: MIT
 </p></div>
 
 <div class="feature">
-<span class="category">(srfi NNN base)<br>procedure</span>
+<span class="category">(srfi 281 base)<br>procedure</span>
 <code class="signature">(<a id="native-endianness" href="#native-endianness">native-endianness</a>)</code>
 </div>
 
@@ -402,7 +402,7 @@ SPDX-License-Identifier: MIT
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN base)<br>procedure</span>
+<span class="category">(srfi 281 base)<br>procedure</span>
 <code class="signature">(<a id="make-bytevector" href="#make-bytevector">make-bytevector</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -417,7 +417,7 @@ SPDX-License-Identifier: MIT
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN base)<br>procedure</span>
+<span class="category">(srfi 281 base)<br>procedure</span>
 <code class="signature">(<a id="bytevectoreqp" href="#bytevectoreqp">bytevector=?</a>
                          <var>bytevector<sub>1</sub></var>
                          <var>bytevector<sub>2</sub></var>
@@ -461,7 +461,7 @@ The order predicates come from <a href="https://srfi.schemers.org/srfi-207">SRFI
 </p></div>
 
 <div class="feature">
-<span class="category">(srfi NNN base)<br>procedure</span>
+<span class="category">(srfi 281 base)<br>procedure</span>
 <code class="signature">(<a id="make-bytevector" href="#make-bytevector">bytevector-fill!</a>
                          <var>bytevector</var>
                          <var>b8</var>
@@ -475,7 +475,7 @@ The order predicates come from <a href="https://srfi.schemers.org/srfi-207">SRFI
 
 <h2 id="endianness-library"><a href="#endianness-library">&para;</a> Endianness library</h2>
 <div class="feature">
-<span class="category">(srfi NNN endianness)<br>syntax</span>
+<span class="category">(srfi 281 endianness)<br>syntax</span>
 <code class="signature">(<a id="endianness" href="#endianness">endianness</a> ⟨<var>endianness symbol</var>⟩)</code>
 </div>
 
@@ -506,7 +506,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN serialization)<br>procedure</span>
+<span class="category">(srfi 281 serialization)<br>procedure</span>
 <code class="signature">(<a id="bytevector-to-hex-string" href="#bytevector-to-hex-string">bytevector-&gt;hex-string</a>
                          <var>bytevector</var>
                          [<var>start</var> [<var>end</var>]])</code>
@@ -519,7 +519,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN serialization)<br>procedure</span>
+<span class="category">(srfi 281 serialization)<br>procedure</span>
 <code class="signature">(<a id="hex-string-to-bytevector" href="#hex-string-to-bytevector">hex-string-&gt;bytevector</a>
                          <var>string</var>
                          [<var>start</var> [<var>end</var>]])</code>
@@ -537,7 +537,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN serialization)<br>procedure</span>
+<span class="category">(srfi 281 serialization)<br>procedure</span>
 <code class="signature">(<a id="bytevector-to-base64" href="#bytevector-to-base64">bytevector-&gt;base64</a>
                          <var>bytevector</var>
                          [<var>digits</var> [<var>start</var> [<var>end</var>]]])</code>
@@ -560,7 +560,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <p>This description defers to RFC 4648.</p>
 
 <div class="feature">
-<span class="category">(srfi NNN serialization)<br>procedure</span>
+<span class="category">(srfi 281 serialization)<br>procedure</span>
 <code class="signature">(<a id="base64-to-bytevector" href="#base64-to-bytevector">base64-&gt;bytevector</a>
                          <var>string</var>
                          [<var>digits</var> [<var>start</var> [<var>end</var>]]])</code>
@@ -586,13 +586,13 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <h2 id="u8-library"><a href="#u8-library">&para;</a> 8-bit integer libraries</h2>
 
 <p>
-  The <code>(srfi NNN u8)</code> library exports the <span
+  The <code>(srfi 281 u8)</code> library exports the <span
   class="report-name">R<sup>7</sup>RS</span> procedures
   <code>bytevector-u8-ref</code> and <code>bytevector-u8-set!</code>.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN u8)<br>procedure</span>
+<span class="category">(srfi 281 u8)<br>procedure</span>
 <code class="signature">(<a id="u8-list-to-bytevector" href="#u8-list-to-bytevector">u8-list-&gt;bytevector</a>
                          <var>list</var>
                          [<var>start</var> [<var>end</var>]])</code>
@@ -607,7 +607,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN u8)<br>procedure</span>
+<span class="category">(srfi 281 u8)<br>procedure</span>
 <code class="signature">(<a id="bytevector-to-u8-list" href="#bytevector-to-u8-list">bytevector-&gt;u8-list</a>
                          <var>bytevector</var>
                          [<var>start</var> [<var>end</var>]])</code>
@@ -619,7 +619,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN s8)<br>procedure</span>
+<span class="category">(srfi 281 s8)<br>procedure</span>
 <code class="signature">(<a id="bytevector-s8-ref" href="#bytevector-s8-ref">bytevector-s8-ref</a>
                          <var>bytevector</var>
                          <var>k</var>)</code>
@@ -637,7 +637,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 ><code class="example-code">(bytevector-s8-ref #u8(255) 0)</code> ⇒ -1</pre>
 
 <div class="feature">
-<span class="category">(srfi NNN s8)<br>procedure</span>
+<span class="category">(srfi 281 s8)<br>procedure</span>
 <code class="signature">(<a id="bytevector-s8-set" href="#bytevector-s8-set">bytevector-s8-set!</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -662,7 +662,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <h2 id="arbitrary-precision-library"><a href="#arbitrary-precision-library">&para;</a> Arbitrary precision library</h2>
 
 <div class="feature">
-<span class="category">(srfi NNN int)<br>procedure</span>
+<span class="category">(srfi 281 int)<br>procedure</span>
 <code class="signature">(<a id="bytevector-uint-ref" href="#bytevector-uint-ref">bytevector-uint-ref</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -681,7 +681,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN int)<br>procedure</span>
+<span class="category">(srfi 281 int)<br>procedure</span>
 <code class="signature">(<a id="bytevector-uint-set" href="#bytevector-uint-set">bytevector-uint-set!</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -703,7 +703,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN int)<br>procedure</span>
+<span class="category">(srfi 281 int)<br>procedure</span>
 <code class="signature">(<a id="bytevector-sint-ref" href="#bytevector-sint-ref">bytevector-sint-ref</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -723,7 +723,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN int)<br>procedure</span>
+<span class="category">(srfi 281 int)<br>procedure</span>
 <code class="signature">(<a id="bytevector-sint-set" href="#bytevector-sint-set">bytevector-sint-set!</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -745,7 +745,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN int)<br>procedure</span>
+<span class="category">(srfi 281 int)<br>procedure</span>
 <code class="signature">(<a id="bytevector-to-uint-list" href="#bytevector-to-uint-list">bytevector-&gt;uint-list</a>
                          <var>bytevector</var>
                          <var>endianness</var>
@@ -766,7 +766,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN int)<br>procedure</span>
+<span class="category">(srfi 281 int)<br>procedure</span>
 <code class="signature">(<a id="uint-list-to-bytevector" href="#uint-list-to-bytevector">uint-list-&gt;bytevector</a>
                          <var>list</var>
                          <var>endianness</var>
@@ -787,7 +787,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN int)<br>procedure</span>
+<span class="category">(srfi 281 int)<br>procedure</span>
 <code class="signature">(<a id="sint-list-to-bytevector" href="#sint-list-to-bytevector">sint-list-&gt;bytevector</a>
                          <var>list</var>
                          <var>endianness</var>
@@ -821,7 +821,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN ⟨n⟩)<br>procedure</span>
+<span class="category">(srfi 281 ⟨n⟩)<br>procedure</span>
 <code class="signature">(<a id="bytevector-n-ref" href="#bytevector-n-ref">bytevector-⟨n⟩-ref</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -839,7 +839,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN ⟨n⟩)<br>procedure</span>
+<span class="category">(srfi 281 ⟨n⟩)<br>procedure</span>
 <code class="signature">(<a id="bytevector-n-native-ref" href="#bytevector-n-native-ref">bytevector-⟨n⟩-native-ref</a>
                          <var>bytevector</var>
                          <var>k</var>)</code>
@@ -857,7 +857,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN ⟨n⟩)<br>procedure</span>
+<span class="category">(srfi 281 ⟨n⟩)<br>procedure</span>
 <code class="signature">(<a id="bytevector-n-set" href="#bytevector-n-set">bytevector-⟨n⟩-set!</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -880,7 +880,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN ⟨n⟩)<br>procedure</span>
+<span class="category">(srfi 281 ⟨n⟩)<br>procedure</span>
 <code class="signature">(<a id="bytevector-n-native-set" href="#bytevector-n-native-set">bytevector-⟨n⟩-native-set!</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -923,7 +923,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <h3 id="binary32"><a href="#binary32">&para;</a> Binary32 library</h3>
 
 <div class="feature">
-<span class="category">(srfi NNN f32)<br>procedure</span>
+<span class="category">(srfi 281 f32)<br>procedure</span>
 <code class="signature">(<a id="bytevector-binary32-ref" href="#bytevector-binary32-ref">bytevector-binary32-ref</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -946,7 +946,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 <div class="feature">
 
-<span class="category">(srfi NNN f32)<br>procedure</span>
+<span class="category">(srfi 281 f32)<br>procedure</span>
 <code class="signature">(<a id="bytevector-binary32-set" href="#bytevector-binary32-set">bytevector-binary32-set!</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -971,7 +971,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN f32)<br>procedure</span>
+<span class="category">(srfi 281 f32)<br>procedure</span>
 <code class="signature">(<a id="bytevector-binary32-native-ref" href="#bytevector-binary32-native-ref">bytevector-binary32-native-ref</a>
                          <var>bytevector</var>
                          <var>k</var>)</code><br>
@@ -992,7 +992,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN f32)<br>procedure</span>
+<span class="category">(srfi 281 f32)<br>procedure</span>
 <code class="signature">(<a id="bytevector-binary32-native-set" href="#bytevector-binary32-native-set">bytevector-binary32-native-set!</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -1017,7 +1017,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <h3 id="binary64"><a href="#binary64">&para;</a> Binary64 library</h3>
 
 <div class="feature">
-<span class="category">(srfi NNN f64)<br>procedure</span>
+<span class="category">(srfi 281 f64)<br>procedure</span>
 <code class="signature">(<a id="bytevector-binary64-ref" href="#bytevector-binary64-ref">bytevector-binary64-ref</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -1041,7 +1041,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <div class="feature">
 
 <div class="feature">
-<span class="category">(srfi NNN f64)<br>procedure</span>
+<span class="category">(srfi 281 f64)<br>procedure</span>
 <code class="signature">(<a id="bytevector-binary64-set" href="#bytevector-binary64-set">bytevector-binary64-set!</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -1066,7 +1066,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN f64)<br>procedure</span>
+<span class="category">(srfi 281 f64)<br>procedure</span>
 <code class="signature">(<a id="bytevector-binary64-native-ref" href="#bytevector-binary64-native-ref">bytevector-binary64-native-ref</a>
                          <var>bytevector</var>
                          <var>k</var>)</code><br>
@@ -1087,7 +1087,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN f64)<br>procedure</span>
+<span class="category">(srfi 281 f64)<br>procedure</span>
 <code class="signature">(<a id="bytevector-binary64-native-set" href="#bytevector-binary64-native-set">bytevector-binary64-native-set!</a>
                          <var>bytevector</var>
                          <var>k</var>
@@ -1154,7 +1154,7 @@ the procedure attempts to decode invalid
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN unicode)<br>procedure</span>
+<span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="error-handling-modep" href="#error-handling-modep">error-handling-mode?</a>
                          <var>obj</var>)</code><br>
 </div>
@@ -1165,7 +1165,7 @@ the procedure attempts to decode invalid
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN unicode)<br>procedure</span>
+<span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="i-o-decoding-errorp" href="#i-o-decoding-errorp">i/o-decoding-error?</a>
                          <var>obj</var>)</code><br>
 </div>
@@ -1184,7 +1184,7 @@ the procedure attempts to decode invalid
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN error-handling-mode)<br>syntax</span>
+<span class="category">(srfi 281 error-handling-mode)<br>syntax</span>
 <code class="signature">(<a id="error-handling-mode" href="#error-handling-mode">error-handling-mode</a>
                          ⟨symbol⟩)</code><br>
 </div>
@@ -1203,7 +1203,7 @@ Only the name of ⟨<var>symbol</var>⟩ is significant.
 
 <h3 id="encoding-procedures"><a href="#encoding-procedures">&para;</a> Encoding procedures</h3>
 <div class="feature">
-<span class="category">(srfi NNN unicode)<br>procedure</span>
+<span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="utf8-to-string" href="#utf8-to-string">utf8-&gt;string</a>
                          <var>bytevector</var>
                          [<var>start</var> [<var>end</var> [<var>error-handling-mode</var>]]])</code>
@@ -1215,7 +1215,7 @@ Only the name of ⟨<var>symbol</var>⟩ is significant.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN unicode)<br>procedure</span>
+<span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="utf16-to-string" href="#utf16-to-string">utf16-&gt;string</a>
                          <var>bytevector</var>
                          <var>endianness</var>
@@ -1223,7 +1223,7 @@ Only the name of ⟨<var>symbol</var>⟩ is significant.
                          [<var>start</var> [<var>end</var> [<var>error-handling-mode</var>]]]])</code>
 </div>
 <div class="feature">
-<span class="category">(srfi NNN unicode)<br>procedure</span>
+<span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="utf32-to-string" href="#utf32-to-string">utf32-&gt;string</a>
                          <var>bytevector</var>
                          <var>endianness</var>
@@ -1252,7 +1252,7 @@ BOM in the encoding is decoded as a regular character.
 
 <h3 id="decoding-procedures"><a href="#decoding-procedures">&para;</a> Decoding procedures</h3>
 <div class="feature">
-<span class="category">(srfi NNN unicode)<br>procedure</span>
+<span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="string-to-utf8" href="#string-to-utf8">string-&gt;utf8</a>
                          <var>string</var>
                          [<var>start</var> [<var>end</var>]])</code>
@@ -1265,13 +1265,13 @@ BOM in the encoding is decoded as a regular character.
 </p>
 
 <div class="feature">
-<span class="category">(srfi NNN unicode)<br>procedure</span>
+<span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="string-to-utf16" href="#string-to-utf16">string-&gt;utf16</a>
                          <var>string</var> [<var>endianness</var>
                          [<var>start</var> [<var>end</var>]]])</code>
 </div>
 <div class="feature">
-<span class="category">(srfi NNN unicode)<br>procedure</span>
+<span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="string-to-utf32" href="#string-to-utf32">string-&gt;utf32</a>
                          <var>string</var> [<var>endianness</var>
                          [<var>start</var> [<var>end</var>]]])</code>
@@ -1360,7 +1360,7 @@ Library summaries</h2>
    procedure, usually with the same name.
 </p>
 
-<h3><code>(srfi NNN base)</code></h3>
+<h3><code>(srfi 281 base)</code></h3>
 <p class="never-break-inside">
 <code><a href="#endiannessp">endianness?</a></code>
 <code><a href="#native-endianness">native-endianness</a></code><sup>6</sup>
@@ -1372,12 +1372,12 @@ Library summaries</h2>
 <code>bytevector-copy</code><sup>7</sup>
 </p>
 
-<h3><code>(srfi NNN endianness)</code></h3>
+<h3><code>(srfi 281 endianness)</code></h3>
 <p class="never-break-inside">
 <code><a href="#endianness">endianness</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN serialization)</code></h3>
+<h3><code>(srfi 281 serialization)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-to-hex-string">bytevector-&gt;hex-string</a></code>
 <code><a href="#hex-string-to-bytevector">hex-string-&gt;bytevector></a></code>
@@ -1385,7 +1385,7 @@ Library summaries</h2>
 <code><a href="#base64-to-bytevector">base64-&gt;bytevector</a></code>
 </p>
 
-<h3><code>(srfi NNN u8)</code></h3>
+<h3><code>(srfi 281 u8)</code></h3>
 <p class="never-break-inside">
 <code>bytevector-u8-ref</code><sup>6,7</sup>
 <code>bytevector-u8-set!</code><sup>6,7</sup>
@@ -1393,13 +1393,13 @@ Library summaries</h2>
 <code><a href="#bytevector-to-u8-list">bytevector-&gt;u8-list</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN s8)</code></h3>
+<h3><code>(srfi 281 s8)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-u8-ref">bytevector-s8-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-u8-set">bytevector-s8-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN int)</code></h3>
+<h3><code>(srfi 281 int)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-uint-ref">bytevector-uint-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-uint-set">bytevector-uint-set!</a></code><sup>6</sup>
@@ -1411,7 +1411,7 @@ Library summaries</h2>
 <code><a href="#sint-list-to-bytevector">sint-list-&gt;bytevector</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN u16)</code></h3>
+<h3><code>(srfi 281 u16)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-u16-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-u16-native-ref</a></code><sup>6</sup>
@@ -1419,7 +1419,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-u16-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN s16)</code></h3>
+<h3><code>(srfi 281 s16)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-s16-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-s16-native-ref</a></code><sup>6</sup>
@@ -1427,7 +1427,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-s16-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN u32)</code></h3>
+<h3><code>(srfi 281 u32)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-u32-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-u32-native-ref</a></code><sup>6</sup>
@@ -1435,7 +1435,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-u32-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN s32)</code></h3>
+<h3><code>(srfi 281 s32)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-s32-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-s32-native-ref</a></code><sup>6</sup>
@@ -1443,7 +1443,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-s32-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN u64)</code></h3>
+<h3><code>(srfi 281 u64)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-u64-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-u64-native-ref</a></code><sup>6</sup>
@@ -1451,7 +1451,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-u64-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN s64)</code></h3>
+<h3><code>(srfi 281 s64)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-n-ref">bytevector-s64-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-n-native-ref">bytevector-s64-native-ref</a></code><sup>6</sup>
@@ -1459,7 +1459,7 @@ Library summaries</h2>
 <code><a href="#bytevector-n-set">bytevector-s64-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN f32)</code></h3>
+<h3><code>(srfi 281 f32)</code></h3>
 <p class="never-break-inside">
 
 <code><a href="#bytevector-binary32-ref">bytevector-binary32-ref</a></code><sup>6</sup>
@@ -1472,7 +1472,7 @@ Library summaries</h2>
 <code><a href="#bytevector-ieee-single-native-set">bytevector-ieee-single-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN f64)</code></h3>
+<h3><code>(srfi 281 f64)</code></h3>
 <p class="never-break-inside">
 <code><a href="#bytevector-binary64-ref">bytevector-binary64-ref</a></code><sup>6</sup>
 <code><a href="#bytevector-ieee-double-ref">bytevector-ieee-double-ref</a></code><sup>6</sup>
@@ -1484,12 +1484,12 @@ Library summaries</h2>
 <code><a href="#bytevector-ieee-double-native-set">bytevector-ieee-double-native-set!</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN error-handling-mode)</code></h3>
+<h3><code>(srfi 281 error-handling-mode)</code></h3>
 <p class="never-break-inside">
 <code><a href="#error-handling-mode">error-handling-mode</a></code><sup>6</sup>
 </p>
 
-<h3><code>(srfi NNN unicode)</code></h3>
+<h3><code>(srfi 281 unicode)</code></h3>
 <p class="never-break-inside">
 <code><a href="#error-handling-modep">error-handling-mode?</a></code>
 <code><a href="#i-o-decoding-errorp">i/o-decoding-error?</a></code><sup>6</sup>

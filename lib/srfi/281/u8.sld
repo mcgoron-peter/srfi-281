@@ -1,4 +1,4 @@
-(define-library (srfi NNN u8)
+(define-library (srfi 281 u8)
   (import (scheme base) (scheme case-lambda))
   (export bytevector-u8-ref
           bytevector-u8-set!

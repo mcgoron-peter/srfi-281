@@ -1,5 +1,5 @@
-(define-library (srfi NNN s64)
-  (import (scheme base) (only (srfi NNN base) endianness?))
+(define-library (srfi 281 s64)
+  (import (scheme base) (only (srfi 281 base) endianness?))
   (export bytevector-s64-ref
           bytevector-s64-set!
           bytevector-s64-native-ref

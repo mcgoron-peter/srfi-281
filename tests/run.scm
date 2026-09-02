@@ -13,7 +13,7 @@
         (srfi 194)
         (rename (srfi 252)
                 (test-property %test-property))
-        (srfi NNN))
+        (srfi 281))
 
 ;;; CHANGE ME!
 ;;; 
@@ -130,9 +130,9 @@
         (boolean-generator)))
 
 ;;; ;;;;;;;;;;;;;;;
-;;; (srfi NNN base)
+;;; (srfi 281 base)
 ;;; ;;;;;;;;;;;;;;;
-(test-begin "SRFI NNN")
+(test-begin "SRFI 281")
 
 (define skip-current-tests? #f)
 (test-skip (lambda (x) skip-current-tests?))
@@ -144,11 +144,11 @@
   (test-equal
    "(endianness big)"
    'big
-   (eval '(endianness big) (environment '(srfi NNN endianness))))
+   (eval '(endianness big) (environment '(srfi 281 endianness))))
   (test-equal
    "(endianness little)"
    'little
-   (eval '(endianness little) (environment '(srfi NNN endianness)))))
+   (eval '(endianness little) (environment '(srfi 281 endianness)))))
 
 (test-group "make-bytevector"
   (test-equal "empty" #u8() (make-bytevector 0))
@@ -240,7 +240,7 @@
                          (bytevector+range-generator)))))
 
 ;;; ;;;;;;;;;;;;;;
-;;; (srfi NNN u8)
+;;; (srfi 281 u8)
 ;;; ;;;;;;;;;;;;;;
 
 (test-group "u8-list->bytevector and bytevector->u8-list"
@@ -296,7 +296,7 @@
                    (list (bytevector+range-generator)))))
 
 ;;; ;;;;;;;;;;;;;;
-;;; (srfi NNN s8)
+;;; (srfi 281 s8)
 ;;; ;;;;;;;;;;;;;;
 
 (test-group "bytevector-s8-ref for all negative integers"
@@ -345,7 +345,7 @@
    (list (make-random-signed-integer-generator 1))))
 
 ;;; ;;;;;;;;;;;;;
-;;; (srfi NNN int)
+;;; (srfi 281 int)
 ;;; ;;;;;;;;;;;;;
 
 (define (make-width-generator)
@@ -474,7 +474,7 @@
      (bytevector->uint-list b (endianness little) 2))))
 
 ;;; ;;;;;;;;;;;;;;
-;;; (srfi NNN u16)
+;;; (srfi 281 u16)
 ;;; ;;;;;;;;;;;;;;
 
 (define (u16:exhaustive-test endianness)
@@ -493,7 +493,7 @@
   (u16:exhaustive-test 'little))
 
 ;;; ;;;;;;;;;;;;;;
-;;; (srfi NNN s16)
+;;; (srfi 281 s16)
 ;;; ;;;;;;;;;;;;;;
 
 (define (s16:exhaustive-test endianness)
@@ -512,7 +512,7 @@
   (s16:exhaustive-test 'little))
 
 ;;; ;;;;;;;;;;;;;;;;;
-;;; (srfi NNN u32)
+;;; (srfi 281 u32)
 ;;; ;;;;;;;;;;;;;;;;;
 
 (test-group "u32"
@@ -540,7 +540,7 @@
          (make-random-integer-generator 1 100))))
 
 ;;; ;;;;;;;;;;;;;;;;;
-;;; (srfi NNN x64)
+;;; (srfi 281 x64)
 ;;; ;;;;;;;;;;;;;;;;;
 
 (test-group "u64"
@@ -691,7 +691,7 @@
          (string-generator))))
 
 ;;; ;;;;;;;;;;;;;;
-;;; (srfi NNN f32)
+;;; (srfi 281 f32)
 ;;; ;;;;;;;;;;;;;;
 
 (define (bytevector-reverse bv)
@@ -781,7 +781,7 @@
           #u8(0 #x7F #xFF #xFF))))
 
 ;;; ;;;;;;;;;;;;;;
-;;; (srfi NNN f64)
+;;; (srfi 281 f64)
 ;;; ;;;;;;;;;;;;;;
 
 (define (bytevector-reverse bv)
@@ -869,7 +869,7 @@
           #u8(0 #x0F #xFF #xFF #xFF #xFF #xFF #xFF))))
 
 ;;; ;;;;;;;;;;
-;;; (srfi NNN unicode)
+;;; (srfi 281 unicode)
 ;;; ;;;;;;;;;;
 
 (test-group "error-handling-mode?"
@@ -883,7 +883,7 @@
            (test-equal
             sym
             (eval `(error-handling-mode ,sym)
-                  (environment '(srfi NNN error-handling-mode)))))))
+                  (environment '(srfi 281 error-handling-mode)))))))
     (test 'raise)
     (test 'replace)
     (test 'ignore)))
@@ -1187,4 +1187,4 @@
                                             'little
                                             #t)))
 
-(test-end "SRFI NNN")
+(test-end "SRFI 281")
