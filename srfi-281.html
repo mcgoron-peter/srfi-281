@@ -240,6 +240,8 @@ SPDX-License-Identifier: MIT
   in their standard libraries.
 </p>
 
+<h2 id="specification"><a href="#specification">&para;</a>Specification</h2>
+
 <h3 id="default-behavior"><a href="#default-behavior">&para;</a> Default behavior of decoders</h3>
 
 <p>
@@ -285,7 +287,7 @@ SPDX-License-Identifier: MIT
   procedures, one can import <code>(rnrs bytevectors)</code>.
 </p>
 
-<h2 id="convention"><a href="#convention">&para;</a> Conventions</h2>
+<h3 id="convention"><a href="#convention">&para;</a> Conventions</h3>
 
 <p>
   All procedures in this SRFI return newly allocated containers
@@ -321,7 +323,7 @@ SPDX-License-Identifier: MIT
   <a href="https://srfi.schemers.org/srfi-274/">SRFI 274</a>.
 </p>
 
-<h2 id="optional-required"><a href="#optional-required">&para;</a> Optional and required features</h2>
+<h3 id="optional-required"><a href="#optional-required">&para;</a> Optional and required features</h3>
 
 <p>
   The libraries <a href="#composite-library"><code>(srfi 281)</code></a>,
@@ -352,7 +354,7 @@ SPDX-License-Identifier: MIT
   and <code>(scheme bytevector)</code> not have any sublibraries.
 </p>
 
-<h2 id="composite-library"><a href="#composite-library">&para;</a> Composite library</h2>
+<h3 id="composite-library"><a href="#composite-library">&para;</a> Composite library</h3>
 
 <p>The library <code>(srfi 281)</code> exports all identifiers defined
    below that are supported by the implementation. For example, if an
@@ -361,7 +363,7 @@ SPDX-License-Identifier: MIT
    library does not export it.
 </p>
 
-<h2 id="base-library"><a href="#base-library">&para;</a> Base library</h2>
+<h3 id="base-library"><a href="#base-library">&para;</a> Base library</h3>
 
 <p>
   The library <code>(srfi 281 base)</code> exports
@@ -473,7 +475,7 @@ The order predicates come from <a href="https://srfi.schemers.org/srfi-207">SRFI
   to <var>end</var> with the appropriate byte value of <var>b8</var>.
 </p>
 
-<h2 id="endianness-library"><a href="#endianness-library">&para;</a> Endianness library</h2>
+<h3 id="endianness-library"><a href="#endianness-library">&para;</a> Endianness library</h3>
 <div class="feature">
 <span class="category">(srfi 281 endianness)<br>syntax</span>
 <code class="signature">(<a id="endianness" href="#endianness">endianness</a> ⟨<var>endianness symbol</var>⟩)</code>
@@ -495,7 +497,7 @@ implementation, an error is raised.
 Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p></div>
 
-<h2 id="serialization-library"><a href="#serialization-library">&para;</a> Serialization library</h2>
+<h3 id="serialization-library"><a href="#serialization-library">&para;</a> Serialization library</h3>
 
 <p>
   These procedures are adapted from
@@ -583,7 +585,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 
 <p>This description defers to RFC 4648.</p>
 
-<h2 id="u8-library"><a href="#u8-library">&para;</a> 8-bit integer libraries</h2>
+<h3 id="u8-library"><a href="#u8-library">&para;</a> 8-bit integer libraries</h3>
 
 <p>
   The <code>(srfi 281 u8)</code> library exports the <span
@@ -659,7 +661,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 (bytevector-s8-set! bv 0 -128)
 <code class="example-code">(bytevector-u8-ref bv 0)</code> ⇒ 128</pre>
 
-<h2 id="arbitrary-precision-library"><a href="#arbitrary-precision-library">&para;</a> Arbitrary precision library</h2>
+<h3 id="arbitrary-precision-library"><a href="#arbitrary-precision-library">&para;</a> Arbitrary precision library</h3>
 
 <div class="feature">
 <span class="category">(srfi 281 int)<br>procedure</span>
@@ -807,7 +809,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   <var>size</var>.
 </p>
 
-<h2 id="multibyte-libraries"><a href="#multibyte-libraries">&para;</a> Multibyte libraries</h2>
+<h3 id="multibyte-libraries"><a href="#multibyte-libraries">&para;</a> Multibyte libraries</h3>
 
 <p>
   There are libraries handling signed twos-complement and unsigned
@@ -902,7 +904,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   <var>k</var>, with the native endianness.
 </p>
 
-<h2 id="#floating-point-libraries"><a href="#floating-point-libraries">&para;</a> Floating-point libraries</h2>
+<h3 id="#floating-point-libraries"><a href="#floating-point-libraries">&para;</a> Floating-point libraries</h3>
 
 <p>
   These procedures convert real numbers to and from IEEE 754 binary
@@ -920,7 +922,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   deprecated.
 </p>
 
-<h3 id="binary32"><a href="#binary32">&para;</a> Binary32 library</h3>
+<h4 id="binary32"><a href="#binary32">&para;</a> Binary32 library</h4>
 
 <div class="feature">
 <span class="category">(srfi 281 f32)<br>procedure</span>
@@ -1014,7 +1016,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   the native endianness.
 </p>
 
-<h3 id="binary64"><a href="#binary64">&para;</a> Binary64 library</h3>
+<h4 id="binary64"><a href="#binary64">&para;</a> Binary64 library</h4>
 
 <div class="feature">
 <span class="category">(srfi 281 f64)<br>procedure</span>
@@ -1109,7 +1111,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   the native endianness.
 </p>
 
-<h2 id="unicode-libraries"><a href="#unicode-libraries">&para;</a> Unicode libraries</h2>
+<h3 id="unicode-libraries"><a href="#unicode-libraries">&para;</a> Unicode libraries</h3>
 
 <p>
   Encoded Unicode text has certain features such as overlong encodings
@@ -1175,8 +1177,8 @@ the procedure attempts to decode invalid
   raised by a decoding procedure.
 </p>
 
-<h3 id="error-handling-mode-section"><a href="#error-handling-mode-section"
->&para;</a> Error handling mode macro</h3>
+<h4 id="error-handling-mode-section"><a href="#error-handling-mode-section"
+>&para;</a> Error handling mode macro</h4>
 
 <p>
   This library is optional because this syntactic form cannot be
@@ -1201,7 +1203,7 @@ the procedure attempts to decode invalid
 Only the name of ⟨<var>symbol</var>⟩ is significant.
 </p></div>
 
-<h3 id="encoding-procedures"><a href="#encoding-procedures">&para;</a> Encoding procedures</h3>
+<h4 id="encoding-procedures"><a href="#encoding-procedures">&para;</a> Encoding procedures</h4>
 <div class="feature">
 <span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="utf8-to-string" href="#utf8-to-string">utf8-&gt;string</a>
@@ -1250,7 +1252,7 @@ specifies the endianness of the encoding, and any
 BOM in the encoding is decoded as a regular character.
 </p>
 
-<h3 id="decoding-procedures"><a href="#decoding-procedures">&para;</a> Decoding procedures</h3>
+<h4 id="decoding-procedures"><a href="#decoding-procedures">&para;</a> Decoding procedures</h4>
 <div class="feature">
 <span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="string-to-utf8" href="#string-to-utf8">string-&gt;utf8</a>
