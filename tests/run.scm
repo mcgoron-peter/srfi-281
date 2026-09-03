@@ -16,7 +16,7 @@
         (srfi 281))
 
 ;;; CHANGE ME!
-;;; 
+;;;
 ;;; If your implementation does not support bixnums, change this to a
 ;;; smaller number.
 (define max-test-integer-width-in-bytes 16)

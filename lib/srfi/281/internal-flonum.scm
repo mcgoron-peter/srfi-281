@@ -48,7 +48,7 @@
 (define (significand->digits significand sigfigs)
   ;; Convert the significand (1 <= significand < fl-radix)
   ;; to a list of digits, least significant first.
-  ;; 
+  ;;
   ;; The function returns two values: the accumulated list, and the rest of
   ;; the significand. This is useful for rounding.
   (let loop ((i 0) (significand significand) (acc '()))

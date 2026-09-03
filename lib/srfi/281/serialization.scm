@@ -146,7 +146,7 @@
 
 (define standard-base64-char?
   (let ((l (string->list
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ\ 
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ\
              abcdefghijklmnopqrstuvwxyz\
              0123456789=")))
     (lambda (char)

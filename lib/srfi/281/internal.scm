@@ -37,13 +37,13 @@
   (define (big:signed->unsigned-factory period)
     ;; Convert a signed number to its representation in two's
     ;; complement.
-    ;; 
+    ;;
     ;; 8 bit example:
     ;; -128 maps to 128
     ;; -127 maps to 129
     ;; ...
     ;; -1 maps to 255
-    ;; 
+    ;;
     ;; so the map is x + 256 for x < 0.
     (lambda (word)
       (if (negative? word)
@@ -52,13 +52,13 @@
   (define (big:unsigned->signed-factory period limit)
     ;; Convert an unsigned number that represents a number in
     ;; two's complement into a signed number with the actual value.
-    ;; 
+    ;;
     ;; 8 bit example:
     ;; 128 maps to -128
     ;; 129 maps to -127
     ;; ...
     ;; 255 maps to -1
-    ;; 
+    ;;
     ;; so the map is x - 256 for x >= 128.
     (lambda (word)
       (if (<= limit word)
