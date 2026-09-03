@@ -147,7 +147,7 @@ SPDX-License-Identifier: MIT
       <li>
         <a href="#unicode-libraries">¶ Unicode libraries</a>
         <ul>
-          <li><a href="#error-handling-mode-section">¶ Error handling mode macro</a></li>
+          <li><a href="#error-handling-mode-section">¶ Error-handling mode macro</a></li>
           <li><a href="#encoding-procedures">¶ Encoding procedures</a></li>
           <li><a href="#decoding-procedures">¶ Decoding procedures</a></li>
         </ul>
@@ -233,7 +233,7 @@ Library summaries</a></li>
   The <span class="report-name">R<sup>6</sup>RS</span> bytevector library
   was voted into the <span class="report-name">R<sup>7</sup>RS</span> Large
   with no modificiations. Over time, some issues with adopting this library
-  as-is have cropped up:
+  as is have cropped up:
 </p>
 
 <ol>
@@ -306,7 +306,7 @@ Library summaries</a></li>
 </p>
 
 <p>
-  Error raising behavior is more natural. It is the default behavior of
+  Error-raising behavior is more natural. It is the default behavior of
   textual ports in the <span class="report-name">R<sup>6</sup>RS</span>,
   and raising an error in response to bad input allows a user or the
   programmer to be alerted to corrupted text, as opposed to figuring
@@ -576,7 +576,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 
 <p>
   Returns a newly allocated bytevector, where each sequential pair of hexadecimal
-  digits in <var>string</var> between <var>start</var> and <var>end</var> are
+  digits in <var>string</var> between <var>start</var> and <var>end</var> is
   converted into the corresponding byte.
 </p>
 
@@ -598,7 +598,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <p>
   Converts the bytes of <var>bytevector</var> between <var>start</var> and <var>end</var>
   into a base64 encoded string. The numbers 62 and 63 are encoded as the first and
-  second character respectively in <var>digits</var>.
+  second character, respectively, in <var>digits</var>.
 </p>
 
 <p>This description defers to RFC 4648.</p>
@@ -612,8 +612,8 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 
 <p>
   It is an error if <var>digits</var> is not a string of two characters
-  or <code>#f</code>. It is an error if the string contains ASCII alphanumeric
-  characters or the character <code>=</code>.
+  or <code>#f</code>. It is an error if <var>digits</var> contains an ASCII alphanumeric
+  character or the character <code>=</code>.
   If <var>digits</var> is not supplied or <code>#f</code>,
   it defaults to <code>"+/"</code>.
 </p>
@@ -621,7 +621,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <p>
   Decodes the base64-encoded <var>string</var> between <var>start</var>
   and <var>end</var> into a bytevector. The first and second characters in
-  <var>digits</var> are decoded into the numbers 62 and 63 respectively.
+  <var>digits</var> are decoded into the numbers 62 and 63, respectively.
   Characters satisfying <code>char-whitespace?</code> are ignored.
 </p>
 
@@ -795,6 +795,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
                          <var>endianness</var>
                          <var>size</var>
                          [<var>start</var> [<var>end</var>]])</code>
+<br>
 <code class="signature">(<a id="bytevector-to-sint-list" href="#bytevector-to-sint-list">bytevector-&gt;sint-list</a>
                          <var>bytevector</var>
                          <var>endianness</var>
@@ -824,7 +825,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <p>
-  Return a newly allocated bytevector comprised of the elements
+  Return a newly allocated bytevector comprising the elements
   of <var>list</var> between <var>start</var> and <var>end</var>
   encoded with endianness <var>endianness</var> with size
   <var>size</var>.
@@ -845,7 +846,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <p>
-  Return a newly allocated bytevector comprised of the elements
+  Return a newly allocated bytevector comprising the elements
   of <var>list</var> between <var>start</var> and <var>end</var>
   encoded with endianness <var>endianness</var> with size
   <var>size</var>.
@@ -860,7 +861,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   <code>s32</code>, <code>u64</code>, and <code>s64</code>. The
   metavariable ⟨n⟩ is bound to one of these names. The
   metavariable ⟨w⟩ is bound to the size in octets of each type of
-  integer. Explicitly ⟨w⟩ is 2 for 16 bit integers, ⟨w⟩ is 4
+  integer. Explicitly, ⟨w⟩ is 2 for 16 bit integers, ⟨w⟩ is 4
   for 32 bit integers, and ⟨w⟩ is 8 for 64 bit integers.
 </p>
 
@@ -878,7 +879,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <p>
-  Retrieve the ⟨w⟩ byte number from <var>bytevector</var> starting at
+  Retrieve the ⟨w⟩-byte number from <var>bytevector</var> starting at
   <var>k</var>, with endianness <var>endianness</var>.
 </p>
 
@@ -896,7 +897,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <p>
-  Retrieve the ⟨w⟩ byte number from <var>bytevector</var> starting at
+  Retrieve the ⟨w⟩-byte number from <var>bytevector</var> starting at
   <var>k</var>, with the native endianness.
 </p>
 
@@ -919,7 +920,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <p>
-  Store the ⟨w⟩ byte number <var>n</var> into <var>bytevector</var> starting at
+  Store the ⟨w⟩-byte number <var>n</var> into <var>bytevector</var> starting at
   <var>k</var>, with endianness <var>endianness</var>.
 </p>
 
@@ -942,7 +943,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p>
 
 <p>
-  Store the ⟨w⟩ byte number <var>n</var> into <var>bytevector</var> starting at
+  Store the ⟨w⟩-byte number <var>n</var> into <var>bytevector</var> starting at
   <var>k</var>, with the native endianness.
 </p>
 
@@ -1204,7 +1205,7 @@ the procedure attempts to decode invalid
 </div>
 
 <p>
-  Return <code>#t</code> if <var>obj</var> is a valid error handling mode,
+  Return <code>#t</code> if <var>obj</var> is a valid error-handling mode,
   and <code>#f</code> otherwise.
 </p>
 
@@ -1215,12 +1216,12 @@ the procedure attempts to decode invalid
 </div>
 
 <p>
-  Returns <code>#t</code> if <var>obj</var> is an exception that was
+  Return <code>#t</code> if <var>obj</var> is an exception that was
   raised by a decoding procedure.
 </p>
 
 <h4 id="error-handling-mode-section"><a href="#error-handling-mode-section"
->&para;</a> Error handling mode macro</h4>
+>&para;</a> Error-handling mode macro</h4>
 
 <p>
   This library is optional because this syntactic form cannot be
@@ -1233,7 +1234,7 @@ the procedure attempts to decode invalid
                          ⟨symbol⟩)</code><br>
 </div>
 <p>
-  The name of ⟨symbol⟩ must be a symbol describing a error handling
+  The name of ⟨symbol⟩ must be a symbol describing an error-handling
   mode. The expression <code>(error-handling-mode ⟨symbol⟩)</code>
   evaluates to the symbol named ⟨symbol⟩. If ⟨symbol⟩ is a symbol
   not supported by the implementation, an error is raised.
@@ -1337,9 +1338,9 @@ BOM in the encoding is decoded as a regular character.
 <p>
   An <span class="report-name">R<sup>7</sup>RS</span> implementation
   of this SRFI is available in the <a href="https://github.com/scheme-requests-for-implementation/srfi-281">SRFI repository</a>. It only requires
-  fixnum of at least 24 bits (<a href="https://srfi.schemers.org/srfi-143/">SRFI 143</a>),
+  fixnums of at least 24 bits (<a href="https://srfi.schemers.org/srfi-143/">SRFI 143</a>),
   which are very common.
-  Implementers are strongly encouraged to use an optimized implementation
+  Implementers are strongly encouraged to use an optimized implementation,
   or to implement these procedures as primitives.
 </p>
 
@@ -1353,10 +1354,10 @@ BOM in the encoding is decoded as a regular character.
 <p>
   On <span class="report-name">R<sup>6</sup>RS</span> implementations
   (those that already have the <code>(rnrs bytevectors)</code> library),
-  MIT-Scheme, Chibi, CHICKEN (all implementations with explicit renaming
+  MIT Scheme, Chibi, CHICKEN (all implementations with explicit-renaming
   transformers), and Gambit (<code>define-macro</code>), 
   the <code><a href="#endianness">endianness</a></code> macro is implemented.
-  Otherwise it is not supported.
+  Otherwise, it is not supported.
 </p>
 
 <p>
