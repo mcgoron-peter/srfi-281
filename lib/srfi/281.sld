@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 (define-library (srfi 281)
   (import (scheme base)
           (srfi 281 base) (srfi 281 u8) (srfi 281 serialization))

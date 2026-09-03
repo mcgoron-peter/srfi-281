@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 (begin
   (define-syntax branch
     (syntax-rules ()

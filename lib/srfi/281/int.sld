@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 (define-library (srfi 281 int)
   (export bytevector-uint-ref bytevector-uint-set!
           bytevector-sint-ref bytevector-sint-set!

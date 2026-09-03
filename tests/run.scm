@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 (import (except (scheme base)
                 make-bytevector
                 bytevector-u8-ref

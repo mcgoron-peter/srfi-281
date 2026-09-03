@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 (define (error-handling-mode? obj)
   (case obj
     ((raise ignore replace) #t)

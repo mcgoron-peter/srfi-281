@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 (define-library (srfi 281 u64)
   (import (scheme base) (only (srfi 281 base) endianness?))
   (export bytevector-u64-ref

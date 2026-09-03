@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 ;;; TODO: This has to handle whitespace characters.
 
 (define (value->hex-digit value)

@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 (define u8-list->bytevector
   (case-lambda
     ((list) (u8-list->bytevector list 0))

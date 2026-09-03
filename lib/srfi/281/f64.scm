@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 (define (bytevector-binary64-set! bv k x endianness)
   (unless (bytevector? bv)
     (error "not a bytevector bv"))

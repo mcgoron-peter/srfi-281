@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 (define-library (srfi 281 internal-flonum)
   (import (scheme base) (scheme case-lambda)
           (srfi 143)

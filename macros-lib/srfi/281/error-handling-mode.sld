@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 (define-library (srfi 281 error-handling-mode)
   (cond-expand
     (chicken

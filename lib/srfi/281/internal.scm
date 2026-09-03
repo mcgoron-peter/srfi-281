@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 ;;;; This set of library declarations will specialize certain operations
 ;;;; to optimized (fixnum) procedures.
 

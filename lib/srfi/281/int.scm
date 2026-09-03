@@ -1,3 +1,7 @@
+; SPDX-FileCopyrightText: 2026 Peter McGoron
+;
+; SPDX-License-Identifier: MIT
+
 (define (bytevector-uint-ref bv k e size)
   (unless (and (exact-integer? size)
                (positive? size))
