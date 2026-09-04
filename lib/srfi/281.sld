@@ -6,7 +6,7 @@
   (import (scheme base)
           (srfi 281 base) (srfi 281 u8) (srfi 281 serialization))
   (export endianness? native-endianness
-          bytevector? make-bytevector bytevector-fill!
+          bytevector bytevector? make-bytevector bytevector-fill!
           bytevector-length
           bytevector=? bytevector<? bytevector<=?
           bytevector>? bytevector>=?

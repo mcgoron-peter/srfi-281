@@ -137,11 +137,13 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
 <ul>
   <li><a href="#abstract"> Abstract</a></li>
   <li><a href="#issues"> Issues</a></li>
-  <li><a href="#rationale"> Rationale</a></li>
+  <li><a href="#rationale"> Rationale</a>
+      <ul>
+      <li><a href="#default-behavior"> Default behavior of decoders</a></li>
+      </ul>
   <li>
     <a href="#specification">Specification</a>
     <ul>
-      <li><a href="#default-behavior"> Default behavior of decoders</a></li>
       <li><a href="#convention"> Conventions</a></li>
       <li><a href="#optional-required"> Optional and required features</a></li>
       <li><a href="#composite-library"> Composite library</a></li>
@@ -162,8 +164,8 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
         <a href="#unicode-libraries"> Unicode libraries</a>
         <ul>
           <li><a href="#error-handling-mode-section"> Error-handling mode macro</a></li>
-          <li><a href="#encoding-procedures"> Encoding procedures</a></li>
           <li><a href="#decoding-procedures"> Decoding procedures</a></li>
+          <li><a href="#encoding-procedures"> Encoding procedures</a></li>
         </ul>
       </li>
     </ul>
@@ -252,7 +254,8 @@ Library summaries</a></li>
 
 <ol>
 <li>The <code>bytevector-copy!</code> procedure has a different argument
-    order than the procedure in the <span class="report-name">R<sup>7</sup>RS</span>
+    order and interprets its last argument differently than the
+    procedure in the <span class="report-name">R<sup>7</sup>RS</span>
     base library.</li>
 <li>The procedure <code>bytevector-copy</code> is a subset of the behavior
     in the <span class="report-name">R<sup>7</sup>RS</span>.</li>
@@ -295,8 +298,6 @@ Library summaries</a></li>
   standard procedures, and implementations are encouraged to use them
   in their standard libraries.
 </p>
-
-<h2 id="specification"><a href="#specification"></a>Specification</h2>
 
 <h3 id="default-behavior"><a href="#default-behavior"></a> Default behavior of decoders</h3>
 
@@ -342,6 +343,9 @@ Library summaries</a></li>
   If one specifically wants the <span class="report-name">R<sup>6</sup>RS</span>
   procedures, one can import <code>(rnrs bytevectors)</code>.
 </p>
+
+
+<h2 id="specification"><a href="#specification"></a>Specification</h2>
 
 <h3 id="convention"><a href="#convention"></a> Conventions</h3>
 
@@ -424,7 +428,7 @@ Library summaries</a></li>
 <p>
   The library <code>(srfi 281 base)</code> exports
   the <span class="report-name">R<sup>7</sup>RS</span> procedures
-  <code>bytevector?</code>, <code>bytevector-length</code>, and
+  <code>bytevector?</code>, <code>bytevector</code>, <code>bytevector-length</code>, and
   <code>bytevector-copy</code>.
 </p>
 
@@ -462,7 +466,6 @@ Library summaries</a></li>
 <div class="feature">
 <span class="category">(srfi 281 base)<br>procedure</span>
 <code class="signature">(<a id="make-bytevector" href="#make-bytevector">make-bytevector</a>
-                         <var>bytevector</var>
                          <var>k</var>
                          [<var>b8</var>])</code>
 </div>
@@ -538,14 +541,13 @@ The order predicates come from <a href="https://srfi.schemers.org/srfi-207/">SRF
 </div>
 
 <p>
-The name of ⟨<var>endianness symbol</var>⟩ must be a symbol
-describing an endianness. The expression <code>(endianness
+If ⟨<var>endianness symbol</var>⟩ is a symbol supported by the
+implementation as an endianness, then the expression <code>(endianness
 ⟨<var>endianness symbol</var>⟩)</code> evaluates to the symbol named
-⟨<var>endianness symbol</var>⟩. If
-⟨<var>endianness symbol</var>⟩ is a symbol not supported by the
-implementation, an error is raised.
+⟨<var>endianness symbol</var>⟩. If ⟨<var>endianness symbol</var>⟩
+is a symbol not supported by the implementation, an error is raised when
+this form is expanded.
 </p>
-
 
 <div class="boxed">
 <p>
@@ -1249,10 +1251,12 @@ the procedure attempts to decode invalid
                          ⟨symbol⟩)</code><br>
 </div>
 <p>
-  The name of ⟨symbol⟩ must be a symbol describing an error-handling
-  mode. The expression <code>(error-handling-mode ⟨symbol⟩)</code>
-  evaluates to the symbol named ⟨symbol⟩. If ⟨symbol⟩ is a symbol
-  not supported by the implementation, an error is raised.
+  If ⟨<var>symbol</var>⟩ is a symbol supported by the
+  implementation as an error-handling mode, then the expression
+  <code>(error-handling-mode ⟨symbol⟩)</code> evaluates to the symbol
+  named ⟨<var>symbol</var>⟩. If ⟨<var>symbol</var>⟩ is a symbol
+  not supported by the implementation, an error is raised when this form
+  is expanded.
 </p>
 
 <div class="boxed">
@@ -1261,7 +1265,7 @@ the procedure attempts to decode invalid
 Only the name of ⟨<var>symbol</var>⟩ is significant.
 </p></div>
 
-<h4 id="encoding-procedures"><a href="#encoding-procedures"></a> Encoding procedures</h4>
+<h4 id="decoding-procedures"><a href="#decoding-procedures"></a> Decoding procedures</h4>
 <div class="feature">
 <span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="utf8-to-string" href="#utf8-to-string">utf8-&gt;string</a>
@@ -1310,7 +1314,7 @@ specifies the endianness of the encoding, and any
 BOM in the encoding is decoded as a regular character.
 </p>
 
-<h4 id="decoding-procedures"><a href="#decoding-procedures"></a> Decoding procedures</h4>
+<h4 id="encoding-procedures"><a href="#encoding-procedures"></a> Encoding procedures</h4>
 <div class="feature">
 <span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="string-to-utf8" href="#string-to-utf8">string-&gt;utf8</a>
@@ -1428,6 +1432,7 @@ Library summaries</h2>
 <code><a href="#make-bytevector">make-bytevector</a></code><sup>6</sup>
 <code><a href="#bytevector-fill">bytevector-fill!</a></code>
 <code>bytevector-length</code><sup>6,7</sup>
+<code>bytevector</code><sup>7</sup>
 <code><a href="#bytevectoreqp">bytevector=?</a></code>
 <code>bytevector-copy</code><sup>7</sup>
 </p>
