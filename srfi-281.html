@@ -20,6 +20,14 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
                 --text-color: black;
                 --visited-link-color: purple;
               }
+
+              pre {
+                  border: 1px solid;
+                  padding: 7.5px;
+                  background-color: #f0f0f0;
+                  margin-bottom: 18pt;
+              }
+
               code {
                   background-color: #f0f0f0;
               }
@@ -32,6 +40,14 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
                 --text-color: #e0e0e0;
                 --visited-link-color: Orchid;
               }
+
+              pre {
+                  border: 1px solid;
+                  padding: 7.5px;
+                  background-color: #2b2b2b;
+                  margin-bottom: 18pt;
+              }
+
               code {
                 background-color: #2b2b2b;
               }
@@ -46,9 +62,6 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
 
             .normal-font {
               font-family: sans-serif;
-            }
-            .no-bg {
-              background-color: var(--background-color);
             }
 
             .feature {
@@ -76,7 +89,7 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
             }
 
             .example-code {
-              background-color: var(--background-color);
+              /* background-color: var(--background-color); */
               display: inline-block;
               min-width: 46ch;
             }
@@ -104,12 +117,6 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
             .evals-text {
               font-family: serif;
               font-style: italic;
-            }
-
-            h2 > a[href^="#"]::before,
-            h3 > a[href^="#"]::before,
-            h4 > a[href^="#"]::before {
-              content: "¶";
             }
     </style>
     <link href="/favicon.png" rel="icon" sizes="192x192" type="image/png">
@@ -336,8 +343,8 @@ Library summaries</a></li>
 </p>
 
 <pre
->(define (r6rs:utf8->string bv)
-  (utf8->string bv 0 (bytevector-length bv) 'replace))</pre>
+><code>(define (r6rs:utf8->string bv)
+  (utf8->string bv 0 (bytevector-length bv) 'replace))</code></pre>
 
 <p>
   If one specifically wants the <span class="report-name">R<sup>6</sup>RS</span>
@@ -477,6 +484,9 @@ Library summaries</a></li>
   elements are unspecified.
 </p>
 
+<pre><code class="example-code"
+>(make-bytevector 3 -128)</code> ⇒ <code>#u8(#x80 #x80 #x80)</code></pre>
+
 <div class="feature">
 <span class="category">(srfi 281 base)<br>procedure</span>
 <code class="signature">(<a id="bytevectoreqp" href="#bytevectoreqp">bytevector=?</a>
@@ -534,6 +544,12 @@ The order predicates come from <a href="https://srfi.schemers.org/srfi-207/">SRF
   to <var>end</var> with the appropriate byte value of <var>b8</var>.
 </p>
 
+<pre
+>(define bv (make-bytevector 6 1))
+(bytevector-fill! bv -1 2 4)
+<code class="example-code">bv</code
+> ⇒ <code>#u8(1 1 #xFF #xFF 1 1)</code></pre>
+
 <h3 id="endianness-library"><a href="#endianness-library"></a> Endianness library</h3>
 <div class="feature">
 <span class="category">(srfi 281 endianness)<br>syntax</span>
@@ -562,7 +578,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   <a href="https://srfi.schemers.org/srfi-207/">SRFI 207</a>
   on account of their general applicability to bytevectors.
   They now take <var>start</var> and <var>end</var>
-  arguments and are no longer required to signal errors.
+  arguments. <strong>TODO: error predicate</strong>
 </p>
 
 <div class="feature">
@@ -577,6 +593,10 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   bytes of <var>bytevector</var> between <var>start</var> and <var>end</var>
   as upper-case ASCII hexadecimal digits.
 </p>
+
+<pre
+><code class="example-code">(bytevector->hex-string #u8(#xFE #xFF))</code
+> ⇒ <code>"FEFF"</code></pre>
 
 <div class="feature">
 <span class="category">(srfi 281 serialization)<br>procedure</span>
@@ -595,6 +615,10 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   digits in <var>string</var> between <var>start</var> and <var>end</var> is
   converted into the corresponding byte.
 </p>
+
+<pre
+><code class="example-code">(hex-string->bytevector "abcdef")</code
+> ⇒ <code>#u8(#xAB #xCD #xEF)</code></pre>
 
 <div class="feature">
 <span class="category">(srfi 281 serialization)<br>procedure</span>
