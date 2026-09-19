@@ -9,6 +9,9 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
     <meta charset="utf-8">
     <title>SRFI 281: Bytevector Utilities</title>
     <style>
+            .strikethrough {
+              text-decoration: line-through;
+            }
             table {
               border: 1px solid;
               margin-bottom: 12pt;
@@ -217,7 +220,7 @@ Library summaries</a></li>
 <span class="report-name">R<sup>6</sup>RS</span>).</li>
 <li>The sample implementation is mostly complete, but is missing a few
     corner cases, particularly in the serialization library.</li>
-<li>I want this SRFI to contain an API comparable to
+<li><div class="strikethrough">I want this SRFI to contain an API comparable to
     <a href="https://srfi.schemers.org/srfi-207/">SRFI 207</a>
     and <a href="https://srfi.schemers.org/srfi-152/">SRFI 152</a>
     adapted to strings and without reference to ASCII characters.
@@ -246,6 +249,11 @@ Library summaries</a></li>
          end argument.
     </li>
     </ul>
+    </div>
+    <p>
+      Bytestring style procedures have been removed, and will be
+      proposed in a different SRFI.
+    </p>
 </li>
 </ol>
 
@@ -489,40 +497,27 @@ Library summaries</a></li>
 
 <div class="feature">
 <span class="category">(srfi 281 base)<br>procedure</span>
+<code class="signature">(<a id="bytevector" href="#bytevector">bytevector</a>
+                         <var>b8</var> …)</code>
+</div>
+
+<p>
+  Return a newly allocated bytevector made up of the arguments.
+</p>
+
+<div class="feature">
+<span class="category">(srfi 281 base)<br>procedure</span>
 <code class="signature">(<a id="bytevectoreqp" href="#bytevectoreqp">bytevector=?</a>
                          <var>bytevector<sub>1</sub></var>
                          <var>bytevector<sub>2</sub></var>
                          <var>bytevector<sub>3</sub></var>
-                         …)</code><br>
-<code class="signature">(<a id="bytevectorltp" href="#bytevectorltp">bytevector&lt;?</a>
-                         <var>bytevector<sub>1</sub></var>
-                         <var>bytevector<sub>2</sub></var>
-                         <var>bytevector<sub>3</sub></var>
-                         …)</code><br>
-<code class="signature">(<a id="bytevectorgtp" href="#bytevectorgtp">bytevector&gt;?</a>
-                         <var>bytevector<sub>1</sub></var>
-                         <var>bytevector<sub>2</sub></var>
-                         <var>bytevector<sub>3</sub></var>
-                         …)</code><br>
-<code class="signature">(<a id="bytevectorltep" href="#bytevectorltep">bytevector&lt;=?</a>
-                         <var>bytevector<sub>1</sub></var>
-                         <var>bytevector<sub>2</sub></var>
-                         <var>bytevector<sub>3</sub></var>
-                         …)</code><br>
-<code class="signature">(<a id="bytevectorgtep" href="#bytevectorgtep">bytevector&gt;=?</a>
-                         <var>bytevector<sub>1</sub></var>
-                         <var>bytevector<sub>2</sub></var>
-                         <var>bytevector<sub>3</sub></var>
-                         …)</code><br>
+                         …)</code>
 </div>
 
 <p>
-  These procedures compare bytevectors lexicographically. Two
-  <var>bytevector</var>s are equal if they have the same number of
-  elements and equal bytes at all valid indices. If two bytevectors
-  differ in length but are the same up to the length of the shorter
-  bytevector, the shorter bytevector is considered to be less than
-  the longer bytevector.
+  Returns <code>#t</code> if each bytevector is of the same length
+  and has equal bytes at all valid indices, and <code>#f</code>
+  otherwise.
 </p>
 
 <div class="boxed">
@@ -1454,6 +1449,7 @@ Library summaries</h2>
 <code><a href="#native-endianness">native-endianness</a></code><sup>6</sup>
 <code>bytevector?</code><sup>6,7</sup>
 <code><a href="#make-bytevector">make-bytevector</a></code><sup>6</sup>
+<code><a href="#bytevector">bytevector</a></code><sup>6</sup>
 <code><a href="#bytevector-fill">bytevector-fill!</a></code>
 <code>bytevector-length</code><sup>6,7</sup>
 <code>bytevector</code><sup>7</sup>

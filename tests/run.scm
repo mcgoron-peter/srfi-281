@@ -4,6 +4,7 @@
 
 (import (except (scheme base)
                 make-bytevector
+                bytevector
                 bytevector-u8-ref
                 bytevector-u8-set!
                 string->utf8
@@ -181,33 +182,9 @@
   (test-assert "truncated right" (not (bytevector=? #u8(1 2 3 4) #u8(1 2 3))))
   (test-assert "multiple equal followed by unequal" (not (bytevector=? #u8() #u8() #u8(1)))))
 
-(test-group "trichotomy of strict bytevector order"
-  (test-property
-   (lambda (bv1 bv2)
-     (let ((< (bytevector<? bv1 bv2))
-           (= (bytevector=? bv1 bv2))
-           (> (bytevector>? bv1 bv2)))
-       (or (and < (not =) (not >))
-           (and = (not <) (not >))
-           (and > (not =) (not <)))))
-   (list (bytevector-generator)
-         (bytevector-generator))))
-
-(test-group "antisymmetry of weak bytevector order"
-  (test-property
-   (lambda (bv1 bv2)
-     (or (bytevector=? bv1 bv2)
-         (let ((<= (bytevector<=? bv1 bv2))
-               (>= (bytevector>=? bv1 bv2)))
-           (or (and <= (not >=))
-               (and >= (not <=))))))
-   (list (bytevector-generator)
-         (bytevector-generator))))
-
-(test-group "bytevector<?"
-  (test-assert (bytevector<? #u8(1 2 3) #u8(1 2 4)))
-  (test-assert (bytevector<? #u8(1 2 3) #u8(1 2 3 4)))
-  (test-assert (not (bytevector<? #u8(1 2 3) #u8(1 2 3)))))
+(test-group "bytevector"
+  (test-equal #u8(#x80 #xFF 0 1 #x80)
+              (bytevector -128 -1 0 1 128)))
 
 (test-group "bytevector-fill!"
   #;(test-group "exhaustive test of negative values"
