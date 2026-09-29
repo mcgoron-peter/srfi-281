@@ -93,7 +93,11 @@
     ((or gauche chicken tr7 (library (srfi 281 unicode)))
      (import (srfi 281 unicode))
      (export error-handling-mode?
-             i/o-decoding-error?
+             unicode-decoding-error?
+             unicode-decoding-error-bytevector
+             unicode-decoding-error-start
+             unicode-decoding-error-end
+             unicode-decoding-error-message
              string->utf8 string->utf16 string->utf32
              utf8->string utf16->string utf32->string)))
   (cond-expand

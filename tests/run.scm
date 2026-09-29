@@ -931,18 +931,19 @@
                (substring string start end))))
    (list (string+range-generator))))
 
-(define-syntax test-raises-i/o-error
+;; TODO: Test elements of error object
+(define-syntax test-raises-unicode-error
   (syntax-rules ()
     ((_ expression)
      (test-assert
-      (guard (x (else (i/o-decoding-error? x)))
+      (guard (x (else (unicode-decoding-error? x)))
         expression
         #f)))))
 
 #;(test-group "exhaustive check for two-byte overlong encodings"
   (do ((i #xC0 (+ i 1)))
       ((= i #xC2))
-    (test-raises-i/o-error
+    (test-raises-unicode-error
      (utf8->string (bytevector i)))
     (test-equal (string (integer->char #xFFFD))
                 (utf8->string (bytevector i)
@@ -956,7 +957,7 @@
                               'ignore))
     (do ((j #x80 (+ j 1)))
         ((> j #xBF))
-      (test-raises-i/o-error
+      (test-raises-unicode-error
        (utf8->string (bytevector i j)))
       (test-equal (string (integer->char #xFFFD)
                           (integer->char #xFFFD))
@@ -970,7 +971,7 @@
 #;(test-group "exhaustive check for three byte overlong encoding"
   (do ((i #x80 (+ i 1)))
       ((= i #xA0))
-    (test-raises-i/o-error
+    (test-raises-unicode-error
      (utf8->string (bytevector #xE0 i)))
     (test-equal (string (integer->char #xFFFD)
                         (integer->char #xFFFD))
@@ -987,7 +988,7 @@
 (test-group "check for three byte truncated encoding"
   (do ((i #xA0 (+ i 1)))
       ((> i #xBF))
-    (test-raises-i/o-error
+    (test-raises-unicode-error
      (utf8->string (bytevector #xE0 i)))
     (test-equal (string (integer->char #xFFFD))
                 (utf8->string (bytevector #xE0 i)
@@ -1005,7 +1006,7 @@
       ((> i #xBF))
     (do ((j #x80 (+ j 1)))
         ((> j #xBF))
-      (test-raises-i/o-error
+      (test-raises-unicode-error
        (utf8->string (bytevector #xED i j)))
       (test-equal (string (integer->char #xFFFD)
                           (integer->char #xFFFD)
@@ -1021,7 +1022,7 @@
                                 'ignore)))))
 
 (test-group "encoding above U+10FFFF"
-  (test-raises-i/o-error
+  (test-raises-unicode-error
    (utf8->string #u8(#xF4 #x90 #x80 #x80)))
   (test-equal (string (integer->char #xFFFD)
                       (integer->char #xFFFD)
@@ -1071,12 +1072,12 @@
       ((= i #xDFFF))
     (let ((bv (make-bytevector 2)))
       (bytevector-u16-set! bv 0 i 'big)
-      (test-raises-i/o-error (utf16->string bv 'big))
+      (test-raises-unicode-error (utf16->string bv 'big))
       (test-equal "\xFFFD;"
                   (utf16->string bv 'big #f 0 2 'replace))
       (test-equal "" (utf16->string bv 'big #f 0 2 'ignore))
       (bytevector-u16-set! bv 0 i 'little)
-      (test-raises-i/o-error (utf16->string bv 'little))
+      (test-raises-unicode-error (utf16->string bv 'little))
       (test-equal "\xFFFD;"
                   (utf16->string bv 'little #f 0 2 'replace))
       (test-equal ""
