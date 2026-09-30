@@ -582,8 +582,10 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
                         >deserialization-error?</a> <var>obj</var>)</code>
 </div>
 
+
 <p>
-  Predicate for errors raised by the procedures in this library.
+  When a deserialization procedure encounters an error, it signals an
+  error that satisfies this predicate.
 </p>
 
 <div class="feature">
@@ -660,14 +662,15 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <p>
   Returns a newly allocated bytevector, where each sequential pair of hexadecimal
   digits in <var>string</var> between <var>start</var> and <var>end</var> is
-  converted into the corresponding byte.
+  converted into the corresponding byte. Characters satisfying
+  <code>char-whitespace?</code> are ignored.
 </p>
 
 <p>
   If <var>string</var> between <var>start</var> and <var>end</var>
   is not made up of pairs of hex digits, an error satisfying <a
   href="#deserialization-error"><code>deserializtion-error?</code></a>
-  is raised.
+  is raised with the invalid part of the string as the start and end.
 </p>
 
 <pre
@@ -725,7 +728,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   If <var>string</var> in between the two indices is
   not a valid base64 string, an error satisfying <a
   href="#deserialization-error"><code>deserializtion-error?</code></a>
-  is raised.
+  is raised with the invalid part of the string as the start and end.
 </p>
 
 <h3 id="u8-library"><a href="#u8-library"></a> 8-bit integer libraries</h3>

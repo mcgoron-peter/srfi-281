@@ -2,6 +2,9 @@
 ;
 ; SPDX-License-Identifier: MIT
 
+;; TODO: This test suite should be refactored to make it easier to test
+;; individual components.
+
 (import (except (scheme base)
                 make-bytevector
                 bytevector
@@ -562,6 +565,10 @@
 (test-group "hex-string->bytevector"
   (test-equal #u8(#xAA #xBB #xCC #xDD)
               (hex-string->bytevector "AaBBcCdd"))
+  (let ((s "AAB!CCDD"))
+    (guard (x (else (and (deserialization-error? x)
+                         (eqv? (deserialization-error-meesage x) s))))
+      (hex-string->bytevector s)))
   (test-equal #u8(#xBB #xCC #xDD)
               (hex-string->bytevector "AaBBcCdd"
                                       2))
@@ -632,9 +639,14 @@
   (test-equal #u8(102) (base64->bytevector "Zg=="))
   (test-equal #u8(102 111) (base64->bytevector "Zm8="))
   (test-equal #u8(102 111 111) (base64->bytevector "Zm9v"))
+  (let ((s "Zm9!v"))
+    (guard (x (else (and (deserialization-error? x)
+                         (eqv? (deserialization-error-meesage x) s))))
+      (base64->bytevector s)))
   (test-equal #u8(102 111 111 98) (base64->bytevector "Zm9vYg=="))
   (test-equal #u8(102 111 111 98 97) (base64->bytevector "Zm9vYmE="))
   (test-equal #u8(102 111 111 98 97 114) (base64->bytevector "Zm9vYmFy"))
+  (test-equal #u8(102 111 111 98 97 114) (base64->bytevector "    Z m 9 v\n Y m F y    "))
   (test-equal #u8(#b11111011 #b11111111 #b10111110)
               (base64->bytevector "+/++"))
   (test-equal #u8(#b11111011 #b11111111 #b10111110)

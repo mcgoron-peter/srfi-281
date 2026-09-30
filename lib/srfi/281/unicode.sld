@@ -15,7 +15,7 @@
      (import (srfi 281 u32)))
     (else))
   (cond-expand
-    ((library (rnrs io ports))
+    ((library (rnrs conditions))
      (import (only (rnrs conditions)
                    condition
                    error?

@@ -11,6 +11,11 @@
           bytevector-copy
           bytevector-u8-ref bytevector-u8-set!
           u8-list->bytevector bytevector->u8-list
+          deserialization-error?
+          deserialization-error-string
+          deserialization-error-start
+          deserialization-error-end
+          deserialization-error-message
           bytevector->hex-string hex-string->bytevector
           bytevector->base64 base64->bytevector)
   (cond-expand
