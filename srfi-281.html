@@ -203,7 +203,7 @@ Library summaries</a></li>
 <h2 id="issues"><a href="#issues"></a> Issues</h2>
 
 <ol>
-<li>Should <code><a href="#native-endianness">native-endianness</a></code>
+<li class="strikethrough">Should <code><a href="#native-endianness">native-endianness</a></code>
     be a procedure or a value?
     The <span class="report-name">R<sup>7</sup>RS</span> Large usually
     does not have procedures like this: the
@@ -218,7 +218,7 @@ Library summaries</a></li>
 </li>
 <li>Needs more examples (they can be adapted from the
 <span class="report-name">R<sup>6</sup>RS</span>).</li>
-<li>The sample implementation is mostly complete, but is missing a few
+<li class="strikethrough">The sample implementation is mostly complete, but is missing a few
     corner cases, particularly in the serialization library.</li>
 <li><div class="strikethrough">I want this SRFI to contain an API comparable to
     <a href="https://srfi.schemers.org/srfi-207/">SRFI 207</a>
@@ -365,9 +365,9 @@ Library summaries</a></li>
 <h3 id="convention"><a href="#convention"></a> Conventions</h3>
 
 <p>
-  All procedures in this SRFI return newly allocated containers
-  (strings, lists, and bytevectors) except that they may not be newly
-  allocated if those containers are empty.
+  All procedures in this SRFI that return containers (strings, lists,
+  and bytevectors) return newly-allocated ones, except that they may
+  not be newly allocated if those containers are empty.
 </p>
 
 <p>
@@ -731,7 +731,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   is raised with the invalid part of the string as the start and end.
 </p>
 
-<h3 id="u8-library"><a href="#u8-library"></a> 8-bit integer libraries</h3>
+<h3 id="u8-library"><a href="#u8-library"></a> Unsigned 8-bit integer libraries</h3>
 
 <p>
   The <code>(srfi 281 u8)</code> library exports the <span
@@ -765,6 +765,8 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   Copies the bytes of <var>bytevector</var> from <var>start</var> to <var>end</var>
   to a newly allocated list.
 </p>
+
+<h3 id="s8-library"><a href="#s8-library"></a> Signed 8-bit integer libraries</h3>
 
 <div class="feature">
 <span class="category">(srfi 281 s8)<br>procedure</span>
@@ -1327,9 +1329,9 @@ the procedure attempts to decode invalid
 
 <div class="feature">
 <span class="category">(srfi 281 unicode)<br>procedure</span>
-<code class="signature">(<a id="unicode-decoding-bytevector"
-                            href="#unicode-decoding-bytevector"
-                         >unicode-decoding-bytevector</a>
+<code class="signature">(<a id="unicode-decoding-error-bytevector"
+                            href="#unicode-decoding-error-bytevector"
+                         >unicode-decoding-error-bytevector</a>
                          <var>e</var>)</code><br>
 </div>
 <p>
@@ -1343,13 +1345,13 @@ the procedure attempts to decode invalid
 
 <div class="feature">
 <span class="category">(srfi 281 unicode)<br>procedure</span>
-<code class="signature">(<a id="unicode-decoding-start"
-                            href="#unicode-decoding-start"
-                         >unicode-decoding-start</a>
+<code class="signature">(<a id="unicode-decoding-error-start"
+                            href="#unicode-decoding-error-start"
+                         >unicode-decoding-error-start</a>
                          <var>e</var>)</code><br>
-<code class="signature">(<a id="unicode-decoding-end"
-                            href="#unicode-decoding-end"
-                         >unicode-decoding-end</a>
+<code class="signature">(<a id="unicode-decoding-error-end"
+                            href="#unicode-decoding-error-end"
+                         >unicode-decoding-error-end</a>
                          <var>e</var>)</code><br>
 </div>
 <p>
@@ -1713,7 +1715,7 @@ Library summaries</h2>
 <code><a href="#deserialization-error-end">deserialization-error-end</a></code>
 <code><a href="#deserialization-error-message">deserialization-error-message</a></code>
 <code><a href="#bytevector-to-hex-string">bytevector-&gt;hex-string</a></code>
-<code><a href="#hex-string-to-bytevector">hex-string-&gt;bytevector></a></code>
+<code><a href="#hex-string-to-bytevector">hex-string-&gt;bytevector</a></code>
 <code><a href="#bytevector-to-base64">bytevector-&gt;base64</a></code>
 <code><a href="#base64-to-bytevector">base64-&gt;bytevector</a></code>
 </p>
@@ -1826,9 +1828,9 @@ Library summaries</h2>
 <p class="never-break-inside">
 <code><a href="#error-handling-modep">error-handling-mode?</a></code>
 <code><a href="#unicode-decoding-errorp">unicode-decoding-error?</a></code>
-<code><a href="#unicode-decoding-bytevector" >unicode-decoding-bytevector</a></code>
-<code><a href="#unicode-decoding-start" >unicode-decoding-start</a></code>
-<code><a href="#unicode-decoding-end" >unicode-decoding-end</a></code>
+<code><a href="#unicode-decoding-error-bytevector" >unicode-decoding-error-bytevector</a></code>
+<code><a href="#unicode-decoding-error-start" >unicode-decoding-error-start</a></code>
+<code><a href="#unicode-decoding-error-end" >unicode-decoding-error-end</a></code>
 <code><a href="#unicode-decoding-error-message">unicode-decoding-error-message</a></code>
 <code><a href="#utf8-to-string">utf8-&gt;string</a></code>
 <code><a href="#utf16-to-string">utf16-&gt;string</a></code>
