@@ -82,6 +82,7 @@
                        (raise-deserialization-error
                         'hex-string->bytevector
                         "invalid hex double"
+                        string
                         i
                         (+ j 1)))
                      (write-u8 (fxior (fxarithmetic-shift-left b1 4)

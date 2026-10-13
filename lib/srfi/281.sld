@@ -73,7 +73,7 @@
              bytevector-u64-native-ref bytevector-u64-native-set!))
     (else))
   (cond-expand
-    ((or gauche chicken tr7 chibi)
+    ((or gauche chicken tr7 chibi (library (rnrs bytevectors)))
      (import (srfi 281 f32))
      (export bytevector-binary32-set!
              bytevector-ieee-single-set!
@@ -85,7 +85,7 @@
              bytevector-ieee-single-native-ref))
     (else))
   (cond-expand
-    ((or gauche chicken tr7 chibi)
+    ((or gauche chicken tr7 chibi (library (rnrs bytevectors)))
      (import (srfi 281 f64))
      (export bytevector-binary64-set!
              bytevector-ieee-single-set!
@@ -97,7 +97,7 @@
              bytevector-ieee-single-native-ref))
     (else))
   (cond-expand
-    ((or gauche chibi chicken tr7)
+    ((or gauche chibi chicken tr7 sagittarius)
      (import (srfi 281 unicode))
      (export error-handling-mode?
              unicode-decoding-error?
@@ -130,7 +130,7 @@
              bytevector-range-condition-bytevector))
     (else))
   (cond-expand
-    ((or gauche chicken (library (srfi 281 error-handling-mode)))
+    ((or gauche chicken sagittarius (library (srfi 281 error-handling-mode)))
      (import (srfi 281 error-handling-mode))
      (export error-handling-mode))
     (else)))
