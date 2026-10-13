@@ -563,7 +563,7 @@
                 (hex-string->bytevector "AaBBcCdd"))
     (let ((s "AAB!CCDD"))
       (guard (x (else (and (deserialization-error? x)
-                           (eqv? (deserialization-error-meesage x) s))))
+                           (eqv? (deserialization-error-message x) s))))
         (hex-string->bytevector s)))
     (test-equal #u8(#xBB #xCC #xDD)
                 (hex-string->bytevector "AaBBcCdd"

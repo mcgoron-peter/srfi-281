@@ -1659,12 +1659,16 @@ BOM in the encoding is decoded as a regular character.
   <a href="https://srfi.schemers.org/srfi-252/">252</a>.
   This uses all optional features (and <code>eval</code>), and in
   full form has millions of assertions. One may wish to comment
-  out parts of the test suite when using it for automated testing.
+  out parts of the test suite when using it for automated testing. To run the
+  test suite, run <code>tests/run.scm</code>, an
+  <span class="report-name">R<sup>7</sup>RS</span> script. If you want to
+  run the test cases interactively in a REPL, you can include the tests
+  from <code>tests/definitions.scm</code>.
 </p>
 
 <p>
-  The sample implementation has been tested on Chibi (bleeding edge from git)
-  and Gauche 0.9.15.
+  The sample implementation has been tested on Chibi (bleeding edge from git),
+  Gauche 0.9.15, and Sagittarius 0.9.14.
 </p>
 
 <h2 id="acknowledgements"><a href="#acknowledgements"></a> Acknowledgements</h2>
