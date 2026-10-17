@@ -581,7 +581,8 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   <a href="https://srfi.schemers.org/srfi-207/">SRFI 207</a>
   on account of their general applicability to bytevectors.
   They now take <var>start</var> and <var>end</var>
-  arguments.
+  arguments. However, the requirement that the procedures must ignore
+  spaces in their input has been removed for efficiency reasons.
 </p>
 
 <div class="feature">
@@ -670,8 +671,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <p>
   Returns a newly allocated bytevector, where each sequential pair of hexadecimal
   digits in <var>string</var> between <var>start</var> and <var>end</var> is
-  converted into the corresponding byte. Characters satisfying
-  <code>char-whitespace?</code> are ignored.
+  converted into the corresponding byte.
 </p>
 
 <p>
@@ -727,7 +727,6 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   Decodes the base64-encoded <var>string</var> between <var>start</var>
   and <var>end</var> into a bytevector. The first and second characters in
   <var>digits</var> are decoded into the numbers 62 and 63, respectively.
-  Characters satisfying <code>char-whitespace?</code> are ignored.
 </p>
 
 <p>This description defers to RFC 4648.</p>

@@ -60,35 +60,30 @@
      (call-with-port (open-output-bytevector)
        (lambda (port)
          (define vec (string->vector string start end))
-         (define (find-next-hex-digit i)
-           (do ((i i (+ i 1)))
-               ((or (= i (vector-length vec))
-                    (not (char-whitespace? (vector-ref vec i))))
-                i)))
          (define (convert-digit i)
-           (let ((i (find-next-hex-digit i)))
-             (if (= i (vector-length vec))
-                 (get-output-bytevector port)
-                 (let ((j (find-next-hex-digit (+ i 1))))
-                   (when (= j (vector-length vec))
-                     (raise-deserializerion-error
+           (if (= i (vector-length vec))
+               (get-output-bytevector port)
+               (let ((j (+ i 1)))
+                 (when (= j (vector-length vec))
+                   (raise-deserialization-error
+                    'hex-string->bytevector
+                    "truncated at end"
+                    string
+                    i
+                    j))
+                 (let ((b1 (hex-digit->value (vector-ref vec i)))
+                       (b2 (hex-digit->value (vector-ref vec j))))
+                   (unless (and b1 b2)
+                     (raise-deserialization-error
                       'hex-string->bytevector
-                      "truncated at end"
+                      "invalid hex double"
+                      string
                       i
-                      j))
-                   (let ((b1 (hex-digit->value (vector-ref vec i)))
-                         (b2 (hex-digit->value (vector-ref vec j))))
-                     (unless (and b1 b2)
-                       (raise-deserialization-error
-                        'hex-string->bytevector
-                        "invalid hex double"
-                        string
-                        i
-                        (+ j 1)))
-                     (write-u8 (fxior (fxarithmetic-shift-left b1 4)
-                                      b2)
-                               port)
-                     (convert-digit (+ j 1)))))))
+                      (+ j 1)))
+                   (write-u8 (fxior (fxarithmetic-shift-left b1 4)
+                                    b2)
+                             port)
+                   (convert-digit (+ j 1))))))
          (convert-digit 0))))))
 
 (define bytevector->base64
@@ -234,23 +229,18 @@
                   ((#\Q) 16) ((#\h) 33) ((#\y) 50)
                   ((#\=) #f)
                   (else 'bad)))))
-           (define (skip-to i)
-             (do ((i i (+ i 1)))
-                 ((or (>= i len)
-                      (not (char-whitespace? (vector-ref vec i))))
-                  i)))
            (define (convert-block i)
              ;; [012345] [670123] [456701] [234567]
-             (let* ((i2 (skip-to (+ i 1)))
-                    (i3 (skip-to (+ i2 1)))
-                    (i4 (skip-to (+ i3 1))))
+             (let* ((i2 (+ i 1))
+                    (i3 (+ i2 1))
+                    (i4 (+ i3 1)))
                (when (or (>= i2 len)
                          (>= i3 len)
                          (>= i4 len))
                  (raise-deserialization-error
                   'base64->bytevector
                   "truncated"
-                  s
+                  string
                   i
                   (min i4 len)))
                (let* ((d1 (convert (vector-ref vec i)))
@@ -264,7 +254,7 @@
                    (raise-deserialization-error
                     'base64->bytevector
                     "invalid base64 characters"
-                    s
+                    string
                     i
                     (+ i4 1)))
                  (write-u8 (fxior (fxarithmetic-shift-left d1 2)
@@ -286,18 +276,16 @@
                      (ensure-end (+ i4 1))
                      (loop (+ i4 1))))))
            (define (ensure-end i)
-             (let ((j (skip-to i)))
-               (unless (>= j len)
-                 (raise-deserialization-error
-                  'base64->bytevector
-                  "data after padding characters"
-                  string
-                  i
-                  j))
-               (get-output-bytevector port)))
+             (unless (>= i len)
+               (raise-deserialization-error
+                'base64->bytevector
+                "data after padding characters"
+                string
+                i
+                (+ i 1)))
+             (get-output-bytevector port))
            (define (loop i)
-             (let ((i (skip-to i)))
-               (if (>= i len)
-                   (get-output-bytevector port)
-                   (convert-block i))))
+             (if (>= i len)
+                 (get-output-bytevector port)
+                 (convert-block i)))
            (loop 0)))))))

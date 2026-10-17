@@ -43,7 +43,7 @@
                     (make-message-condition message)
                     (make-who-condition who)))))
     (else
-     (export deserialization-error-bytevector
+     (export deserialization-error-string
              deserialization-error-start
              deserialization-error-end
              deserialization-error-message

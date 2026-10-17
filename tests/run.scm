@@ -26,6 +26,9 @@
 (include "definitions.scm")
 (test-begin "SRFI 281")
 (test-skip (lambda (x) skip-current-tests?))
+
+(define skip-big-tests? #t)
+
 (test-endianness)
 
 (test-make-bytevector-simple)
@@ -52,13 +55,19 @@
 (test-bytevector-uint-ref-endianness)
 (test-bytevector-sint-ref-endianness)
 (test-bytevector-sint-ref-and-bytevector-sint-set!-inverses)
+(when skip-big-tests?
+  (set! skip-current-tests? #t))
 (test-bytevector->uint-list-and-uint-list->bytevector-inverses)
 (test-bytevector->sint-list-and-sint-list->bytevector-inverses)
+(set! skip-current-tests? #f)
 
+(when skip-big-tests?
+  (set! skip-current-tests? #t))
 (bytevector-u16-big-exhaustive)
 (bytevector-u16-little-exhaustive)
 (bytevector-s16-big-exhaustive)
 (bytevector-s16-little-exhaustive)
+(set! skip-current-tests? #f)
 
 (test-u32-property)
 (test-s32-property)
@@ -87,22 +96,26 @@
 (test-error-handling-mode?)
 (test-error-handling-mode)
 
-(exhaustive-utf8)
 (test-utf8-extreme)
 (test-utf8-truncation)
 (test-string->utf8-and-utf8->string-inverses)
+(test-above-U+10FFFF)
+
+(when skip-big-tests?
+  (set! skip-current-tests? #t))
+(exhaustive-utf8)
 (exhaustive-two-byte-overlong)
 (exhaustive-three-byte-overlong)
 (exhaustive-three-byte-truncated)
 (exhaustive-utf8-surrogate)
-(test-above-U+10FFFF)
-
 (exhaustive-utf16-scalar)
 (exhaustive-utf16-lone-surrogates)
+(exhaustive-utf32)
+(set! skip-current-tests? #f)
+
 (string->utf16-and-utf16->string-inverses)
 (test-utf16-bom)
 
-(exhaustive-utf32)
 (string->utf32-and-utf32->string-inverses)
 (test-utf32-bom)
 
