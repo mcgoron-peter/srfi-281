@@ -231,9 +231,9 @@
                   (else 'bad)))))
            (define (convert-block i)
              ;; [012345] [670123] [456701] [234567]
-             (let* ((i2 (+ i 1))
-                    (i3 (+ i2 1))
-                    (i4 (+ i3 1)))
+             (let ((i2 (+ i 1))
+                   (i3 (+ i 2))
+                   (i4 (+ i 3)))
                (when (or (>= i2 len)
                          (>= i3 len)
                          (>= i4 len))
@@ -243,10 +243,10 @@
                   string
                   i
                   (min i4 len)))
-               (let* ((d1 (convert (vector-ref vec i)))
-                      (d2 (convert (vector-ref vec i2)))
-                      (d3 (convert (vector-ref vec i3)))
-                      (d4 (convert (vector-ref vec i4))))
+               (let ((d1 (convert (vector-ref vec i)))
+                     (d2 (convert (vector-ref vec i2)))
+                     (d3 (convert (vector-ref vec i3)))
+                     (d4 (convert (vector-ref vec i4))))
                  (when (or (eq? d1 'bad)
                            (eq? d2 'bad)
                            (eq? d3 'bad)
