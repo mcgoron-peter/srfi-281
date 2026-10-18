@@ -1,0 +1,15 @@
+;;; SPDX-FileCopyrightText: 2026 Peter McGoron
+;;; SPDX-License-Identifier: MIT
+
+((author "Peter McGoron")
+ (version "0.3.0")
+ (synopsis "Bytevector utilities")
+ (category data)
+ (license "MIT")
+ (test-dependencies srfi-64)
+ (dependencies srfi-1)
+ (components (extension srfi-281
+               (source "chicken-srfi-281.sld")
+               (csc-options "-O3")
+               )
+             ))
