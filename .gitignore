@@ -5,3 +5,6 @@
 *.o
 *.log
 *.link
+*.c
+*.inline
+*.types

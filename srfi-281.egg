@@ -11,5 +11,7 @@
  (components (extension srfi-281
                (source "chicken-srfi-281.sld")
                (csc-options "-O3")
+               (types-file)
+               (inline-file)
                )
              ))
