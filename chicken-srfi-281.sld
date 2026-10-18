@@ -97,7 +97,7 @@ C_return(C_u_i_bytevector_length(bv1) == C_u_i_bytevector_length(bv2) &&
 
     (: bytevector-fill! (bytevector fixnum
                                     #!optional fixnum fixnum
-                                    ->))
+                                    -> undefined))
     (define (bytevector-fill! bv b8 #!optional (start 0)
                                                (end (bytevector-length bv)))
       (unless (and (fixnum? start) (fixnum? end)
