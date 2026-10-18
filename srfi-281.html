@@ -738,6 +738,10 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   is raised with the invalid part of the string as the start and end.
 </p>
 
+<pre
+><code class="example-code">(bytevector->base64 (string->utf8 "R7RS"))</code> ⇒ &quot;UjdSUw==&quot;</code>
+<code  class="example-code">(base64->bytevector &quot;U2NoZW1l&quot;)</code> ⇒ #u8(83 99 104 101 109 101)</code></pre>
+
 <h3 id="u8-library"><a href="#u8-library"></a> Unsigned 8-bit integer libraries</h3>
 
 <p>
