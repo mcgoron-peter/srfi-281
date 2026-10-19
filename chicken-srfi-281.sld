@@ -127,14 +127,18 @@ C_return(C_u_i_bytevector_length(bv1) == C_u_i_bytevector_length(bv2) &&
                                     (size_t start)
                                     (size_t end))
                "memset(bv+start, b8, end-start);")))
-        (lambda (bv b8 #!optional (start 0) (end (bytevector-length bv)))
-          (unless (and (fixnum? start) (fixnum? end) (bytevector? bv)
-
-                       (fx<= 0 start)
-                       (fx<= start end)
-                       (fx<= end (##sys#size bv)))
-            (raise-bounds-error 'bytevector-fill! (list bv start end)))
-          (memset bv b8 start end))))
+        (lambda (bv b8 #!optional (start 0) (end #f))
+          (check! bytevector? bv 'bytevector-fill! "bytevector")
+          (let ((len (##sys#size bv)))
+            (unless (and (fixnum? start) (or (not end) (fixnum? end))
+                         (fx<= 0 start)
+                         (if end
+                             (and (fx<= start end)
+                                  (fx<= end len))
+                             (fx<= start len)))
+                         (or (not end) (fx<= start end))
+              (raise-bounds-error 'bytevector-fill! (list bv start end)))
+            (memset bv b8 start end)))))
 
     (define-syntax endianness
       (er-macro-transformer
@@ -161,16 +165,19 @@ for (; start < end; start++) {
   *str++ = \"0123456789ABCDEF\"[*bv++ & 0xF];
 };
 C_return(strobj);")))
-      (lambda (bv #!optional (start 0) (end (bytevector-length bv)))
-        (unless (and (fixnum? start) (fixnum? end) (bytevector? bv)
-                     (fx<= 0 start)
-                     (fx<= start end)
-                     (fx<= end (##sys#size bv)))
-          (raise-bounds-error 'bytevector->hex-string (list bv start end)))
-        (%bytevector->hex-string bv
-                                 start
-                                 end
-                                 (make-string (fx* (fx- end start) 2))))))
+      (lambda (bv #!optional (start 0) (end #f))
+        (check! bytevector? bv 'bytevector->hex-string "bytevecotr")
+        (let ((size (##sys#size bv)))
+          (unless (and (fixnum? start) (or (not end) (fixnum? end))
+                       (fx<= 0 start)
+                       (if end
+                           (and (fx<= start end) (fx<= end size))
+                           (fx<= start size)))
+            (raise-bounds-error 'bytevector->hex-string (list bv start end)))
+          (%bytevector->hex-string bv
+                                   start
+                                   end
+                                   (make-string (fx* (fx- end start) 2)))))))
 
     (define deserialization-error?
       (let ((p1 (condition-predicate 'deserialization))
@@ -277,7 +284,7 @@ for (start = 0; start < number_of_chars; start += 2, buf += 2, output++) {
 
 C_return(C_SCHEME_FALSE);")))
       (lambda (str #!optional (start 0) (end (string-length str)))
-        (unless (and (fixnum? start) (fixnum? end) (string? str)
+        (unless (and (fixnum? start) (fixnum? end)
                      (fx<= 0 start)
                      (fx<= start end)
                      (fx<= end (string-length str)))
