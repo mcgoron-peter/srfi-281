@@ -12,12 +12,19 @@
           bytevector=? bytevector-fill! endianness
           bytevector->hex-string hex-string->bytevector
           bytevector->base64)
+
   (cond-expand
     (little-endian
       (begin (define-inline %native-endianness (lambda () 'little))))
     (big-endian
       (begin (define-inline %native-endianness (lambda () 'big)))))
   (begin
+    (define-syntax unless-unsafe-and
+      (syntax-rules ()
+        ((_ control expr ...)
+         (cond-expand
+           (unsafe)
+           (else (unless control expr ...))))))
     (define-inline %endianness?
       (lambda (obj)
         (pair? (memq obj '(little big)))))
@@ -64,7 +71,7 @@ C_return(args);")))
         (let* ((len (length b8s))
                (bv (r7rs:make-bytevector len))
                (offending (%bytevector b8s bv len)))
-          (unless (null? offending)
+          (unless-unsafe-and (null? offending)
             (raise (condition `(exn message "invalid arguments"
                                     location bytevector
                                     arguments ,offending)
@@ -81,7 +88,7 @@ C_return(args);")))
 
     (define-inline check!
       (lambda (predicate obj who description)
-        (unless (predicate obj)
+        (unless-unsafe-and (predicate obj)
           (raise-type-error obj who description))))
 
     (: bytevector=? (#!rest bytevector --> boolean))
@@ -131,13 +138,14 @@ C_return(C_u_i_bytevector_length(bv1) == C_u_i_bytevector_length(bv2) &&
         (lambda (bv b8 #!optional (start 0) (end #f))
           (check! bytevector? bv 'bytevector-fill! "bytevector")
           (let ((len (##sys#size bv)))
-            (unless (and (fixnum? start) (or (not end) (fixnum? end))
-                         (fx<= 0 start)
-                         (if end
-                             (and (fx<= start end)
-                                  (fx<= end len))
-                             (fx<= start len)))
-                         (or (not end) (fx<= start end))
+            (unless-unsafe-and
+                (and (fixnum? start) (or (not end) (fixnum? end))
+                     (fx<= 0 start)
+                     (if end
+                         (and (fx<= start end)
+                              (fx<= end len))
+                         (fx<= start len))
+                     (or (not end) (fx<= start end)))
               (raise-bounds-error 'bytevector-fill! (list bv start end)))
             (memset bv b8 start end)))))
 
@@ -169,12 +177,13 @@ C_return(strobj);")))
       (lambda (bv #!optional (start 0) (end #f))
         (check! bytevector? bv 'bytevector->hex-string "bytevecotr")
         (let ((size (##sys#size bv)))
-          (unless (and (fixnum? start) (or (not end) (fixnum? end))
-                       (fx<= 0 start)
-                       (if end
-                           (and (fx<= start end) (fx<= end size))
-                           (fx<= start size)))
-            (raise-bounds-error 'bytevector->hex-string (list bv start end)))
+          (unless-unsafe-and
+              (and (fixnum? start) (or (not end) (fixnum? end))
+                   (fx<= 0 start)
+                   (if end
+                       (and (fx<= start end) (fx<= end size))
+                       (fx<= start size))
+            (raise-bounds-error 'bytevector->hex-string (list bv start end))))
           (%bytevector->hex-string bv
                                    start
                                    end
@@ -285,12 +294,13 @@ for (start = 0; start < number_of_chars; start += 2, buf += 2, output++) {
 
 C_return(C_SCHEME_FALSE);")))
       (lambda (str #!optional (start 0) (end (string-length str)))
-        (unless (and (fixnum? start) (fixnum? end)
-                     (fx<= 0 start)
-                     (fx<= start end)
-                     (fx<= end (string-length str)))
+        (unless-unsafe-and
+            (and (fixnum? start) (fixnum? end)
+                 (fx<= 0 start)
+                 (fx<= start end)
+                 (fx<= end (string-length str)))
           (raise-bounds-error 'hex-string->bytevector (list str start end)))
-        (unless (fx= 0 (fxrem (- end start) 2))
+        (unless-unsafe-and (fx= 0 (fxrem (- end start) 2))
           (raise (condition `(exn location hex-string->bytevector
                                   message "Invalid length for hex string segment"
                                   arguments (,start ,end)))))
@@ -363,19 +373,20 @@ for (;;) {
 C_return(strobj);")))
       (lambda (bv #!optional (digits "+/") (start 0) (end #f))
         (check! bytevector? bv 'bytevector->base64 "bytevector")
-        (unless (and (string? digits) (fx= (string-length digits) 2))
+        (unless-unsafe-and (and (string? digits) (fx= (string-length digits) 2))
           (raise-type-error digits 'bytevector->base64 "string with two elements"))
         (let* ((len (##sys#size bv))
                (end (or end len)))
-          (unless (and (fixnum? start) (fixnum? end)
-                       (fx<= 0 start)
-                       (fx<= start end)
-                       (fx<= end len))
+          (unless-unsafe-and
+              (and (fixnum? start) (fixnum? end)
+                   (fx<= 0 start)
+                   (fx<= start end)
+                   (fx<= end len))
             (raise-bounds-error 'bytevector->base64 (list bv start end)))
           (let ((c1 (char->integer (string-ref digits 0)))
                 (c2 (char->integer (string-ref digits 1))))
-            (unless (and (fx<= 0 c2) (fx<= c2 #x7F)
-                         (fx<= 0 c2) (fx<= c2 #x7F))
+            (unless-unsafe-and (and (fx<= 0 c2) (fx<= c2 #x7F)
+                                    (fx<= 0 c2) (fx<= c2 #x7F))
               (raise (condition `(exn message "digits must be ASCII"
                                       arguments (,digits)))))
             (let* ((complete-blocks (fx/ (fx- end start) 3))
@@ -387,4 +398,109 @@ C_return(strobj);")))
                                       #\=)))
               (%bytevector->base64 bv c1 c2
                                    start end str)))))))
+
+    (define-inline (valid-extra-base64-char? ch)
+      (and (fx<= ch #x7F)
+           (not (and (fx<= #x30 ch) (fx<= ch #x39)))
+           (not (and (fx<= #x41 ch) (fx<= ch #x5A)))
+           (not (and (fx<= #x61 ch) (fx<= ch #x7A)))))
+
+    (: base64->bytevector (string
+                           #!optional
+                           fixnum fixnum string -> bytevector))
+    (define base64->bytevector
+      (let ((%base64->bytevector
+             (foreign-lambda* scheme-object ((scheme-object str)
+                                             (size_t start_char)
+                                             (size_t end)
+                                             (nonnull-bytevector bv)
+                                             (unsigned-byte c62)
+                                             (unsigned-byte c63))
+        "\
+size_t start = C_unfix(C_utf_position(str, C_fix(start_char)));
+char *buf = C_data_pointer(C_block_item(str, 0)) + start;
+int tmp, tmp2;
+
+for (; start < end; start += 4, buf += 4, bv += 3) {
+	tmp = base64_to_portion(buf[0], c62, c63);
+	if (tmp < 0) {
+		C_return(C_fix(start));
+	}
+
+	tmp2 = base64_to_portion(buf[1], c62, c63);
+	if (tmp2 < 0) {
+		C_return(C_fix(start));
+	}
+	bv[0] = (tmp << 2) | (tmp2 >> 4);
+
+	if (buf[2] == '=') {
+		if (buf[3] == '=' && start + 4 == end) {
+			break;
+		} else {
+			C_return(C_fix(start));
+		}
+	}
+
+	tmp = base64_to_portion(buf[2], c62, c63);
+	if (tmp < 0) {
+		C_return(C_fix(start));
+	}
+
+	bv[1] = ((tmp2 & 0xF) << 4) | (tmp >> 2);
+	if (buf[3] == '=') {
+		if (start + 4 == end) {
+			break;
+		} else {
+			C_return(C_fix(start));
+		}
+	}
+
+	tmp = base64_to_portion(buf[3], c62, c63);
+	if (tmp < 0) {
+		C_return(C_fix(start));
+	}
+
+	bv[2] = ((tmp2 & 3) << 2) | tmp;
+}
+C_return(C_SCHEME_FALSE);")))
+        (lambda (str #!optional
+                     (start 0)
+                     (end #f)
+                     (digits "+/"))
+          (check! string? str 'base64->bytevector "string")
+          (unless-unsafe-and (and (string? digits)
+                                  (fx= (string-length digits) 2))
+            (raise-type-error digits 'base64->bytevector "2-char string"))
+          (let* ((len (string-length str))
+                 (end (or end len)))
+            (unless-unsafe-and (and (fixnum? start) (fixnum? end)
+                                    (fx<= 0 start)
+                                    (fx<= start end)
+                                    (fx<= end len))
+              (raise-bounds-error 'base64->bytevector
+                                  (list str start end)))
+            (let* ((c1 (char->integer (string-ref digits 0)))
+                   (c2 (char->integer (string-ref digits 1))))
+              (unless-unsafe-and (and (valid-extra-base64-char? c1)
+                                      (valid-extra-base64-char? c2)
+                                      (not (fx= c1 c2)))
+                (raise (condition `(exn location base64->bytevector
+                                        message "Invalid digits"
+                                        arguments (,digits)))))
+              (let ((groups (fx/ (fx- end start) 4))
+                    (junk (fxrem (fx- end start) 4)))
+                (unless-unsafe-and (fx= junk 0)
+                  (raise (condition `(exn location base64->bytevector
+                                          message "base64 string not padded"
+                                          arguments (,str ,start ,end)))))
+                (let* ((bv (make-bytevector (fx* groups 3)))
+                       (bad-idx (%base64->bytevector str start end bv c1 c2)))
+                  (when bad-idx
+                    (raise (condition `(exn location base64->bytevector
+                                            message "non-alphabetic character in base64"
+                                            arguments (,str ,start ,end))
+                                      `(deserialization string ,str
+                                                        start ,bad-idx
+                                                        end ,(fx+ bad-idx 4)))))
+                  bv)))))))
 ))
