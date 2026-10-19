@@ -10,7 +10,8 @@
           (chicken fixnum))
   (export endianness? native-endianness make-bytevector bytevector
           bytevector=? bytevector-fill! endianness
-          bytevector->hex-string hex-string->bytevector)
+          bytevector->hex-string hex-string->bytevector
+          bytevector->base64)
   (cond-expand
     (little-endian
       (begin (define-inline %native-endianness (lambda () 'little))))
@@ -303,4 +304,87 @@ C_return(C_SCHEME_FALSE);")))
                                                 start ,bad-index
                                                 end ,(fx+ bad-index 1)))))
           bv))))
+
+    (: bytevector->base64 (bytevector
+                           #!optional
+                           string fixnum fixnum
+                           -> string))
+    (define bytevector->base64
+      (let ((%bytevector->base64
+             (foreign-lambda* scheme-object ((nonnull-bytevector bv)
+                                             (unsigned-byte c1)
+                                             (unsigned-byte c2)
+                                             (size_t start)
+                                             (size_t end)
+                                             (scheme-object strobj))
+        "\
+char *str = C_data_pointer(C_block_item(strobj, 0));
+static const char *conv =
+\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";
+size_t diff;
+unsigned char tmp;
+bv += start;
+
+#define BV2B64(b) \\
+  ((b) == 62 ? c1 : (b) == 63 ? c2 : conv[(b)])
+for (;;) {
+  diff = end - start;
+  if (diff == 0) {
+    break;
+  }
+  tmp = (unsigned char)*bv >> 2;
+  *str++ = BV2B64(tmp);
+
+  tmp = ((unsigned char)*bv & 0x3) << 4;
+  if (diff == 1) {
+    *str++ = BV2B64(tmp);
+    break;
+  }
+
+  bv++;
+  tmp |= ((unsigned char)*bv >> 4) & 0xF;
+  *str++ = BV2B64(tmp);
+
+  tmp = ((unsigned char)*bv & 0xF) << 2;
+  if (diff == 2) {
+    *str++ = BV2B64(tmp);
+    break;
+  }
+
+  bv++;
+  tmp |= ((unsigned char) *bv >> 6) & 0x3;
+  *str++ = BV2B64(tmp);
+  *str++ = BV2B64((unsigned char)*bv & 0x3F);
+  bv++;
+
+  start += 3;
+}
+#undef BV2B64
+C_return(strobj);")))
+      (lambda (bv #!optional (digits "+/") (start 0) (end #f))
+        (check! bytevector? bv 'bytevector->base64 "bytevector")
+        (unless (and (string? digits) (fx= (string-length digits) 2))
+          (raise-type-error digits 'bytevector->base64 "string with two elements"))
+        (let* ((len (##sys#size bv))
+               (end (or end len)))
+          (unless (and (fixnum? start) (fixnum? end)
+                       (fx<= 0 start)
+                       (fx<= start end)
+                       (fx<= end len))
+            (raise-bounds-error 'bytevector->base64 (list bv start end)))
+          (let ((c1 (char->integer (string-ref digits 0)))
+                (c2 (char->integer (string-ref digits 1))))
+            (unless (and (fx<= 0 c2) (fx<= c2 #x7F)
+                         (fx<= 0 c2) (fx<= c2 #x7F))
+              (raise (condition `(exn message "digits must be ASCII"
+                                      arguments (,digits)))))
+            (let* ((complete-blocks (fx/ (fx- end start) 3))
+                   (leftover (fxrem (fx- end start) 3))
+                   (str (make-string (fx+ (fx* complete-blocks 4)
+                                          (if (fx= leftover 0)
+                                              0
+                                              4))
+                                      #\=)))
+              (%bytevector->base64 bv c1 c2
+                                   start end str)))))))
 ))
