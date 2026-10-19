@@ -93,32 +93,48 @@ C_return(args);")))
 
     (: bytevector=? (#!rest bytevector --> boolean))
     (define bytevector=?
-      (let ((binary-bytevector=?
-             (foreign-lambda* bool ((scheme-object bv1)
-                                    (scheme-object bv2))
-        "\
-C_return(C_u_i_bytevector_length(bv1) == C_u_i_bytevector_length(bv2) &&
-         memcmp(C_data_pointer(bv1), C_data_pointer(bv2),
-                C_header_size(bv1)) == 0);")))
+      (let ((%bytevector=?
+             (foreign-lambda* scheme-object ((scheme-object lst)
+                                             (scheme-object return_info))
+               "\
+C_word car;
+C_word cadr;
+if (C_truep(C_i_nullp(lst)))
+	C_return(C_SCHEME_TRUE);
+
+car = C_u_i_car(lst);
+if (C_immediatep(car) || !C_truep(C_bytevectorp(car))) {
+	C_u_i_car(return_info) = C_SCHEME_FALSE;
+	C_return(car);
+}
+
+lst = C_u_i_cdr(lst);
+
+while (!C_truep(C_i_nullp(lst))) {
+	cadr = C_u_i_car(lst);
+	if (C_immediatep(cadr)
+	    || !C_truep(C_bytevectorp(cadr))) {
+		C_u_i_car(return_info) = C_SCHEME_FALSE;
+		C_return(cadr);
+	} else if (C_u_i_bytevector_length(car)
+	           == C_u_i_bytevector_length(cadr)
+	           && memcmp(C_data_pointer(car),
+	                     C_data_pointer(cadr),
+	                     C_u_i_bytevector_length(car))) {
+		car = cadr;
+		lst = C_u_i_cdr(lst);
+	} else {
+		C_return(C_SCHEME_FALSE);
+	}
+}
+
+C_return(C_SCHEME_TRUE);")))
         (lambda bvs
-          (cond
-            ((null? bvs) #t)
-            ((null? (cdr bvs))
-             (check! bytevector? (car bvs) 'bytevector=? "bytevector")
-             #t)
-            ((null? (cddr bvs))
-             (let ((b1 (car bvs))
-                   (b2 (cadr bvs)))
-              (check! bytevector? b1 'bytevector=? "bytevector")
-              (check! bytevector? b2 'bytevector=? "bytevector")
-              (binary-bytevector=? b1 b2)))
-            (else
-              (check! bytevector? (car bvs) 'bytevector=? "bytevector")
-              (let loop ((x (car bvs)) (y (cadr bvs)) (rest (cddr bvs)))
-                (check! bytevector? y 'bytevector=? "bytevector")
-                (and (binary-bytevector=? x y)
-                     (or (null? rest)
-                         (loop y (car rest) (cdr rest))))))))))
+          (let* ((rp (cons #t #t))
+                 (rv (%bytevector=? bvs rp)))
+            (unless-unsafe-and (car rp)
+              (raise-type-error rv 'bytevector=? "bytevector"))
+            rv))))
 
     (define (raise-bounds-error who arguments)
       (raise (condition `(exn location ,who
