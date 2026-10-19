@@ -39,12 +39,36 @@
         (else (r7rs:make-bytevector k (b8->u8 b8)))))
 
     (: bytevector (#!rest fixnum -> bytevector))
-    (define (bytevector . b8s)
-      (do ((bv (make-bytevector (length b8s)))
-           (i 0 (fx+ i 1))
-           (b8s b8s (cdr b8s)))
-          ((null? b8s) bv)
-        (bytevector-u8-set! bv i (b8->u8 (car b8s)))))
+    (define bytevector
+      (let ((%bytevector
+             (foreign-lambda* scheme-object ((scheme-object args)
+                                             (nonnull-bytevector bv)
+                                             (size_t len))
+               "\
+size_t i;
+C_word tmp;
+
+for (i = 0; i < len; i++) {
+	tmp = C_u_i_car(args);
+	if (!C_truep(C_fixnump(tmp))) {
+		break;
+	}
+
+	*bv++ = (int8_t)C_unfix(tmp);
+	args = C_u_i_cdr(args);
+}
+
+C_return(args);")))
+      (lambda b8s
+        (let* ((len (length b8s))
+               (bv (r7rs:make-bytevector len))
+               (offending (%bytevector b8s bv len)))
+          (unless (null? offending)
+            (raise (condition `(exn message "invalid arguments"
+                                    location bytevector
+                                    arguments ,offending)
+                              '(type))))
+          bv))))
 
     (define (raise-type-error obj who description)
       (raise (condition `(exn location ,who
@@ -98,14 +122,17 @@ C_return(C_u_i_bytevector_length(bv1) == C_u_i_bytevector_length(bv2) &&
                                     -> undefined))
     (define bytevector-fill!
       (let ((memset
-             (foreign-lambda* void ((bytevector bv)
+             (foreign-lambda* void ((nonnull-bytevector bv)
                                     (unsigned-byte b8)
                                     (size_t start)
                                     (size_t end))
                "memset(bv+start, b8, end-start);")))
         (lambda (bv b8 #!optional (start 0) (end (bytevector-length bv)))
-          (unless (and (fixnum? start) (fixnum? end)
-                       (<= 0 start end (bytevector-length bv)))
+          (unless (and (fixnum? start) (fixnum? end) (bytevector? bv)
+
+                       (fx<= 0 start)
+                       (fx<= start end)
+                       (fx<= end (##sys#size bv)))
             (raise-bounds-error 'bytevector-fill! (list bv start end)))
           (memset bv b8 start end))))
 
@@ -122,7 +149,7 @@ C_return(C_u_i_bytevector_length(bv1) == C_u_i_bytevector_length(bv2) &&
                                -> string))
     (define bytevector->hex-string
       (let ((%bytevector->hex-string
-             (foreign-lambda* scheme-object ((bytevector bv)
+             (foreign-lambda* scheme-object ((nonnull-bytevector bv)
                                              (size_t start)
                                              (size_t end)
                                              (scheme-object strobj))
@@ -135,8 +162,10 @@ for (; start < end; start++) {
 };
 C_return(strobj);")))
       (lambda (bv #!optional (start 0) (end (bytevector-length bv)))
-        (unless (and (fixnum? start) (fixnum? end)
-                     (<= 0 start end (bytevector-length bv)))
+        (unless (and (fixnum? start) (fixnum? end) (bytevector? bv)
+                     (fx<= 0 start)
+                     (fx<= start end)
+                     (fx<= end (##sys#size bv)))
           (raise-bounds-error 'bytevector->hex-string (list bv start end)))
         (%bytevector->hex-string bv
                                  start
@@ -220,7 +249,7 @@ static inline int base64_to_portion(char c, char c62, char c63)
              (foreign-lambda* scheme-object ((scheme-object strobj)
                                              (size_t start_char)
                                              (size_t number_of_chars)
-                                             (bytevector output))
+                                             (nonnull-bytevector output))
         "\
 char c1, c2;
 int tmp;
@@ -248,8 +277,10 @@ for (start = 0; start < number_of_chars; start += 2, buf += 2, output++) {
 
 C_return(C_SCHEME_FALSE);")))
       (lambda (str #!optional (start 0) (end (string-length str)))
-        (unless (and (fixnum? start) (fixnum? end)
-                     (<= 0 start end (string-length str)))
+        (unless (and (fixnum? start) (fixnum? end) (string? str)
+                     (fx<= 0 start)
+                     (fx<= start end)
+                     (fx<= end (string-length str)))
           (raise-bounds-error 'hex-string->bytevector (list str start end)))
         (unless (fx= 0 (fxrem (- end start) 2))
           (raise (condition `(exn location hex-string->bytevector
