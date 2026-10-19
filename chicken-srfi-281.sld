@@ -46,49 +46,47 @@
           ((null? b8s) bv)
         (bytevector-u8-set! bv i (b8->u8 (car b8s)))))
 
-    (define binary-bytevector=?
-      (foreign-lambda* bool ((scheme-object bv1)
-                             (scheme-object bv2))
+    (define (raise-type-error obj who description)
+      (raise (condition `(exn location ,who
+                              message ,(string-append
+                                        "expected "
+                                        description)
+                              arguments (,obj))
+                        '(type))))
+
+    (define-inline check!
+      (lambda (predicate obj who description)
+        (unless (predicate obj)
+          (raise-type-error obj who description))))
+
+    (: bytevector=? (#!rest bytevector --> boolean))
+    (define bytevector=?
+      (let ((binary-bytevector=?
+             (foreign-lambda* bool ((scheme-object bv1)
+                                    (scheme-object bv2))
         "\
 C_return(C_u_i_bytevector_length(bv1) == C_u_i_bytevector_length(bv2) &&
          memcmp(C_data_pointer(bv1), C_data_pointer(bv2),
-                C_header_size(bv1)) == 0);"))
-
-    (define (check! predicate obj who description)
-      (unless (predicate obj)
-        (raise (condition `(exn location ,who
-                                message ,(string-append
-                                          "expected "
-                                          description)
-                                arguments (,obj))
-                          '(type)))))
-
-    (: bytevector=? (#!rest bytevector --> boolean))
-    (define (bytevector=? . bvs)
-      (cond
-        ((null? bvs) #t)
-        ((null? (cdr bvs))
-         (check! bytevector? (car bvs) 'bytevector=? "bytevector"))
-        ((null? (cddr bvs))
-         (let ((b1 (car bvs))
-               (b2 (cadr bvs)))
-          (check! bytevector? b1 'bytevector=? "bytevector")
-          (check! bytevector? b2 'bytevector=? "bytevector")
-          (binary-bytevector=? b1 b2)))
-        (else
-          (check! bytevector? (car bvs) 'bytevector=? "bytevector")
-          (let loop ((x (car bvs)) (y (cadr bvs)) (rest (cddr bvs)))
-            (check! bytevector? y 'bytevector=? "bytevector")
-            (and (binary-bytevector=? x y)
-                 (or (null? rest)
-                     (loop y (car rest) (cdr rest))))))))
-
-    (define memset
-      (foreign-lambda* void ((bytevector bv)
-                             (unsigned-byte b8)
-                             (size_t start)
-                             (size_t end))
-        "memset(bv+start, b8, end-start);"))
+                C_header_size(bv1)) == 0);")))
+        (lambda bvs
+          (cond
+            ((null? bvs) #t)
+            ((null? (cdr bvs))
+             (check! bytevector? (car bvs) 'bytevector=? "bytevector")
+             #t)
+            ((null? (cddr bvs))
+             (let ((b1 (car bvs))
+                   (b2 (cadr bvs)))
+              (check! bytevector? b1 'bytevector=? "bytevector")
+              (check! bytevector? b2 'bytevector=? "bytevector")
+              (binary-bytevector=? b1 b2)))
+            (else
+              (check! bytevector? (car bvs) 'bytevector=? "bytevector")
+              (let loop ((x (car bvs)) (y (cadr bvs)) (rest (cddr bvs)))
+                (check! bytevector? y 'bytevector=? "bytevector")
+                (and (binary-bytevector=? x y)
+                     (or (null? rest)
+                         (loop y (car rest) (cdr rest))))))))))
 
     (define (raise-bounds-error who arguments)
       (raise (condition `(exn location ,who
@@ -98,12 +96,18 @@ C_return(C_u_i_bytevector_length(bv1) == C_u_i_bytevector_length(bv2) &&
     (: bytevector-fill! (bytevector fixnum
                                     #!optional fixnum fixnum
                                     -> undefined))
-    (define (bytevector-fill! bv b8 #!optional (start 0)
-                                               (end (bytevector-length bv)))
-      (unless (and (fixnum? start) (fixnum? end)
-                   (<= 0 start end (bytevector-length bv)))
-        (raise-bounds-error 'bytevector-fill! (list bv start end)))
-      (memset bv b8 start end))
+    (define bytevector-fill!
+      (let ((memset
+             (foreign-lambda* void ((bytevector bv)
+                                    (unsigned-byte b8)
+                                    (size_t start)
+                                    (size_t end))
+               "memset(bv+start, b8, end-start);")))
+        (lambda (bv b8 #!optional (start 0) (end (bytevector-length bv)))
+          (unless (and (fixnum? start) (fixnum? end)
+                       (<= 0 start end (bytevector-length bv)))
+            (raise-bounds-error 'bytevector-fill! (list bv start end)))
+          (memset bv b8 start end))))
 
     (define-syntax endianness
       (er-macro-transformer
@@ -114,11 +118,14 @@ C_return(C_u_i_bytevector_length(bv1) == C_u_i_bytevector_length(bv2) &&
                `(,(rename quote) ,sym)
                (error "unknown endianness" sym))))))
 
-    (define %bytevector->hex-string
-      (foreign-lambda* scheme-object ((bytevector bv)
-                                      (size_t start)
-                                      (size_t end)
-                                      (scheme-object strobj))
+    (: bytevector->hex-string (bytevector #!optional fixnum fixnum
+                               -> string))
+    (define bytevector->hex-string
+      (let ((%bytevector->hex-string
+             (foreign-lambda* scheme-object ((bytevector bv)
+                                             (size_t start)
+                                             (size_t end)
+                                             (scheme-object strobj))
         "\
 char *str = C_data_pointer(C_block_item(strobj, 0));
 bv += start;
@@ -126,20 +133,15 @@ for (; start < end; start++) {
   *str++ = \"0123456789ABCDEF\"[(*bv >> 4) & 0xF];
   *str++ = \"0123456789ABCDEF\"[*bv++ & 0xF];
 };
-C_return(strobj);"))
-
-    (: bytevector->hex-string (bytevector #!optional fixnum fixnum
-                               -> string))
-    (define (bytevector->hex-string bv #!optional
-                                       (start 0)
-                                       (end (bytevector-length bv)))
-      (unless (and (fixnum? start) (fixnum? end)
-                   (<= 0 start end (bytevector-length bv)))
-        (raise-bounds-error 'bytevector->hex-string (list bv start end)))
-      (%bytevector->hex-string bv
-                               start
-                               end
-                               (make-string (fx* (fx- end start) 2))))
+C_return(strobj);")))
+      (lambda (bv #!optional (start 0) (end (bytevector-length bv)))
+        (unless (and (fixnum? start) (fixnum? end)
+                     (<= 0 start end (bytevector-length bv)))
+          (raise-bounds-error 'bytevector->hex-string (list bv start end)))
+        (%bytevector->hex-string bv
+                                 start
+                                 end
+                                 (make-string (fx* (fx- end start) 2))))))
 
     (define deserialization-error?
       (let ((p1 (condition-predicate 'deserialization))
@@ -211,11 +213,14 @@ static inline int base64_to_portion(char c, char c62, char c63)
 }
 ")
 
-    (define %hex-string->bytevector
-      (foreign-lambda* scheme-object ((scheme-object strobj)
-                                      (size_t start_char)
-                                      (size_t number_of_chars)
-                                      (bytevector output))
+    (: hex-string->bytevector (string #!optional fixnum fixnum
+                               -> bytevector))
+    (define hex-string->bytevector
+      (let ((%hex-string->bytevector
+             (foreign-lambda* scheme-object ((scheme-object strobj)
+                                             (size_t start_char)
+                                             (size_t number_of_chars)
+                                             (bytevector output))
         "\
 char c1, c2;
 int tmp;
@@ -241,28 +246,23 @@ for (start = 0; start < number_of_chars; start += 2, buf += 2, output++) {
   *output = (*output << 4) | (unsigned char) tmp;
 }
 
-C_return(C_SCHEME_FALSE);"))
-
-    (: hex-string->bytevector (string #!optional fixnum fixnum
-                               -> bytevector))
-    (define (hex-string->bytevector str #!optional
-                                    (start 0)
-                                    (end (string-length str)))
-      (unless (and (fixnum? start) (fixnum? end)
-                   (<= 0 start end (string-length str)))
-        (raise-bounds-error 'hex-string->bytevector (list str start end)))
-      (unless (fx= 0 (fxrem (- end start) 2))
-        (raise (condition `(exn location hex-string->bytevector
-                                message "Invalid length for hex string segment"
-                                arguments (,start ,end)))))
-      (let* ((bv (make-bytevector (fx/ (fx- end start) 2)))
-             (bad-index (%hex-string->bytevector str start (fx- end start) bv)))
-        (when bad-index
+C_return(C_SCHEME_FALSE);")))
+      (lambda (str #!optional (start 0) (end (string-length str)))
+        (unless (and (fixnum? start) (fixnum? end)
+                     (<= 0 start end (string-length str)))
+          (raise-bounds-error 'hex-string->bytevector (list str start end)))
+        (unless (fx= 0 (fxrem (- end start) 2))
           (raise (condition `(exn location hex-string->bytevector
-                                  message "invalid character in hex string"
-                                  arguments (,str ,bad-index))
-                            `(deserialization string ,str
-                                              start ,bad-index
-                                              end ,(fx+ bad-index 1)))))
-        bv))
+                                  message "Invalid length for hex string segment"
+                                  arguments (,start ,end)))))
+        (let* ((bv (make-bytevector (fx/ (fx- end start) 2)))
+               (bad-index (%hex-string->bytevector str start (fx- end start) bv)))
+          (when bad-index
+            (raise (condition `(exn location hex-string->bytevector
+                                    message "invalid character in hex string"
+                                    arguments (,str ,bad-index))
+                              `(deserialization string ,str
+                                                start ,bad-index
+                                                end ,(fx+ bad-index 1)))))
+          bv))))
 ))
