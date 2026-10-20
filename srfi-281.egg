@@ -10,7 +10,7 @@
  (dependencies srfi-1)
  (components (extension srfi-281
                (source "chicken-srfi-281.sld")
-               (csc-options "-O3")
+               (csc-options "-O3" "-C" "-g")
                (types-file)
                (inline-file)
                )
