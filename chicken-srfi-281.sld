@@ -9,6 +9,7 @@
           (chicken foreign)
           (chicken fixnum))
   (export endianness? native-endianness make-bytevector bytevector
+          bytevector-length bytevector-u8-ref bytevector-u8-set!
           bytevector=? bytevector-fill! endianness
           bytevector->hex-string hex-string->bytevector
           bytevector->base64)
@@ -116,11 +117,10 @@ while (!C_truep(C_i_nullp(lst))) {
 	    || !C_truep(C_bytevectorp(cadr))) {
 		C_u_i_car(return_info) = C_SCHEME_FALSE;
 		C_return(cadr);
-	} else if (C_u_i_bytevector_length(car)
-	           == C_u_i_bytevector_length(cadr)
+	} else if (C_header_size(car) == C_header_size(cadr)
 	           && memcmp(C_data_pointer(car),
 	                     C_data_pointer(cadr),
-	                     C_u_i_bytevector_length(car))) {
+	                     C_header_size(car)) == 0) {
 		car = cadr;
 		lst = C_u_i_cdr(lst);
 	} else {
@@ -208,7 +208,7 @@ C_return(0);")))
          (let* ((sym (list-ref exp 1))
                 (str (symbol->string sym)))
            (if (member str '("little" "big"))
-               `(,(rename quote) ,sym)
+               `(,(rename 'quote) ,sym)
                (error "unknown endianness" sym))))))
 
     (: bytevector->hex-string (bytevector #!optional fixnum fixnum
