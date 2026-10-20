@@ -145,25 +145,62 @@ C_return(C_SCHEME_TRUE);")))
                                     #!optional fixnum fixnum
                                     -> undefined))
     (define bytevector-fill!
-      (let ((memset
-             (foreign-lambda* void ((nonnull-bytevector bv)
-                                    (unsigned-byte b8)
-                                    (size_t start)
-                                    (size_t end))
-               "memset(bv+start, b8, end-start);")))
+      (let ((%bytevector-fill
+             (foreign-lambda* short ((scheme-object bv)
+                                     (scheme-object b8)
+                                     (scheme-object start)
+                                     (scheme-object end))
+               "\
+unsigned char byte;
+size_t len;
+if (C_immediatep(bv) || !C_truep(C_bytevectorp(bv))) {
+	C_return(1);
+}
+
+len = C_u_i_bytevector_length(bv);
+
+if (!C_truep(C_fixnump(b8))) {
+	C_return(2);
+}
+
+if (C_unfix(b8) < -128 || C_unfix(b8) > 255) {
+	C_return(3);
+}
+
+byte = (unsigned char)C_unfix(b8);
+if (!C_truep(C_fixnump(start))) {
+	C_return(4);
+}
+
+if (!C_truep(end)) {
+	end = C_fix(len);
+} else if (!C_truep(C_fixnump(end))) {
+	C_return(5);
+}
+
+if (C_unfix(start) < 0 || C_unfix(start) > C_unfix(end)
+    || C_unfix(end) > len) {
+	C_return(6);
+}
+
+memset(C_c_string(bv) + C_unfix(start),
+       byte,
+       C_unfix(end) - C_unfix(start));
+C_return(0);")))
         (lambda (bv b8 #!optional (start 0) (end #f))
-          (check! bytevector? bv 'bytevector-fill! "bytevector")
-          (let ((len (##sys#size bv)))
-            (unless-unsafe-and
-                (and (fixnum? start) (or (not end) (fixnum? end))
-                     (fx<= 0 start)
-                     (if end
-                         (and (fx<= start end)
-                              (fx<= end len))
-                         (fx<= start len))
-                     (or (not end) (fx<= start end)))
-              (raise-bounds-error 'bytevector-fill! (list bv start end)))
-            (memset bv b8 start end)))))
+          (let ((return-code (%bytevector-fill bv b8 start end)))
+            (cond-expand
+              (unsafe return-code)
+              (else
+                (case return-code
+                  ((0) #t)
+                  ((1) (raise-type-error bv 'bytevector-fill! "bytevector"))
+                  ((2) (raise-type-error b8 'bytevector-fill! "fixnum"))
+                  ((3) (raise-type-error b8 'bytevector-fill! "-128 <= b8 <= 255"))
+                  ((4) (raise-type-error start 'bytevector-fill! "fixnum"))
+                  ((5) (raise-type-error end 'bytevector-fill! "fixnum or #f"))
+                  ((6) (raise-bounds-error 'bytevector-fill!
+                                           (list bv start end))))))))))
 
     (define-syntax endianness
       (er-macro-transformer
@@ -316,7 +353,7 @@ C_return(C_SCHEME_FALSE);")))
                  (fx<= start end)
                  (fx<= end (string-length str)))
           (raise-bounds-error 'hex-string->bytevector (list str start end)))
-        (unless-unsafe-and (fx= 0 (fxrem (- end start) 2))
+        (unless-unsafe-and (fx= 0 (fxrem (fx- end start) 2))
           (raise (condition `(exn location hex-string->bytevector
                                   message "Invalid length for hex string segment"
                                   arguments (,start ,end)))))
