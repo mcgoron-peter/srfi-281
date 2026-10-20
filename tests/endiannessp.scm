@@ -6,8 +6,8 @@
     (test-equal
      "(endianness big)"
      'big
-     (eval '(endianness big) (environment '(srfi 281 endianness))))
+     (eval '(endianness big) (environment '(srfi 281))))
     (test-equal
      "(endianness little)"
      'little
-     (eval '(endianness little) (environment '(srfi 281 endianness))))))
+     (eval '(endianness little) (environment '(srfi 281))))))

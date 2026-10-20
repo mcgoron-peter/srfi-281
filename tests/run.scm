@@ -2,9 +2,6 @@
 ;
 ; SPDX-License-Identifier: MIT
 
-;; TODO: This test suite should be refactored to make it easier to test
-;; individual components.
-
 (import (except (scheme base)
                 make-bytevector
                 bytevector
