@@ -5,7 +5,7 @@
              (test-equal
               sym
               (eval `(error-handling-mode ,sym)
-                    (environment '(srfi 281 error-handling-mode)))))))
+                    (environment '(srfi 281)))))))
       (test 'raise)
       (test 'replace)
       (test 'ignore))))
