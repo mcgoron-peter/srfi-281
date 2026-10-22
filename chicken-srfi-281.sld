@@ -19,7 +19,8 @@
           deserialization-error-string
           deserialization-error-start
           deserialization-error-end
-          u8-list->bytevector bytevector->u8-list)
+          u8-list->bytevector bytevector->u8-list
+          bytevector-s8-ref bytevector-s8-set!)
 
   (cond-expand
     (little-endian
@@ -94,6 +95,17 @@ C_return(args);")))
                               arguments (,obj))
                         '(type))))
 
+    (define (raise-bounds-error who arguments)
+      (raise (condition `(exn location ,who
+                              message "invalid bounds"
+                              arguments ,arguments))))
+
+    (define (raise-index-error who bv i)
+      (raise (condition `(exn location ,who
+                              message "invalid index"
+                              arguments (,bv ,i)))))
+
+
     (define-inline check!
       (lambda (predicate obj who description)
         (unless-unsafe-and (predicate obj)
@@ -142,11 +154,6 @@ C_return(C_SCHEME_TRUE);")))
             (unless-unsafe-and (car rp)
               (raise-type-error rv 'bytevector=? "bytevector"))
             rv))))
-
-    (define (raise-bounds-error who arguments)
-      (raise (condition `(exn location ,who
-                              message "invalid bounds"
-                              arguments ,arguments))))
 
     (: bytevector-fill! (bytevector fixnum
                                     #!optional fixnum fixnum
@@ -739,4 +746,71 @@ C_return(head);")))
                                  (list bv start end)))
             (%bytevector->u8-list bv start end
                                   (make-list (fx- end start)))))))
+    (: bytevector-s8-ref (bytevector fixnum --> fixnum))
+    (define bytevector-s8-ref
+      (let ((%bytevector-s8-ref
+             (foreign-lambda* scheme-object ((scheme-object bv)
+                                             (scheme-object n))
+               "\
+size_t ind;
+if (C_immediatep(bv) || !C_bytevectorp(bv)) {
+	C_return(C_fix(128));
+}
+
+if (!C_truep(C_fixnump(n)) || C_unfix(n) < 0 || C_unfix(n) > SIZE_MAX) {
+	C_return(C_fix(129));
+}
+
+ind = C_unfix(n);
+if (ind >= C_u_i_bytevector_length(bv)) {
+	C_return(C_fix(129));
+}
+
+C_return(C_fix((int8_t)C_c_string(bv)[ind]));")))
+        (lambda (bv k)
+          (let ((r (%bytevector-s8-ref bv k)))
+          (case r
+            ((128)
+             (raise-type-error bv 'bytevector-s8-ref "bytevector"))
+            ((129)
+             (raise-index-error 'bytevector-s8-ref bv k))
+            (else r))))))
+    (: bytevector-s8-set! (bytevector fixnum fixnum -> undefined))
+    (define bytevector-s8-set!
+      (let ((%bytevector-s8-set
+             (foreign-lambda* int ((scheme-object bv)
+                                   (scheme-object in)
+                                   (scheme-object byte))
+               "\
+size_t i;
+if (C_immediatep(bv) || !C_truep(C_bytevectorp(bv))) {
+	C_return(1);
+} else if (!C_truep(C_fixnump(in)) ||
+           C_unfix(in) < 0 || C_unfix(in) >= SIZE_MAX) {
+	C_return(2);
+}
+
+i = C_unfix(in);
+
+if (i >= C_u_i_bytevector_length(bv)) {
+	C_return(3);
+}
+
+if (!C_truep(C_fixnump(byte) ||
+    C_unfix(byte) < -128 ||
+    C_unfix(byte) > 127)) {
+	C_return(4);
+}
+
+(C_c_string(bv))[i] = (uint8_t)C_unfix(byte);
+C_return(0);")))
+        (lambda (bv k byte)
+          (let ((rcode (%bytevector-s8-set bv k byte)))
+            (case rcode
+              ((0) (void))
+              ((1) (raise-type-error bv 'bytevector-s8-set!
+                                     "bytevector"))
+              ((2) (raise-type-error k 'bytevector-s8-set! "index"))
+              ((3) (raise-index-error 'bytevector-s8-set! bv k))
+              ((4) (raise-type-error byte 'bytevector-s8-set! "signed byte")))))))
 ))
