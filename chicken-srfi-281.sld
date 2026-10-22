@@ -7,12 +7,19 @@
           (chicken type)
           (chicken condition)
           (chicken foreign)
-          (chicken fixnum))
+          (chicken fixnum)
+          (srfi 1))
   (export endianness? native-endianness make-bytevector bytevector
           bytevector-length bytevector-u8-ref bytevector-u8-set!
           bytevector=? bytevector-fill! endianness
           bytevector->hex-string hex-string->bytevector
-          bytevector->base64)
+          #| bytevector->base64 base64->bytevector |#
+          deserialization-error?
+          deserialization-error-message
+          deserialization-error-string
+          deserialization-error-start
+          deserialization-error-end
+          u8-list->bytevector bytevector->u8-list)
 
   (cond-expand
     (little-endian
@@ -228,15 +235,14 @@ for (; start < end; start++) {
 };
 C_return(strobj);")))
       (lambda (bv #!optional (start 0) (end #f))
-        (check! bytevector? bv 'bytevector->hex-string "bytevecotr")
-        (let ((size (##sys#size bv)))
+        (check! bytevector? bv 'bytevector->hex-string "bytevector")
+        (let* ((size (##sys#size bv))
+               (end (or end size)))
           (unless-unsafe-and
-              (and (fixnum? start) (or (not end) (fixnum? end))
+              (and (fixnum? start) (fixnum? end)
                    (fx<= 0 start)
-                   (if end
-                       (and (fx<= start end) (fx<= end size))
-                       (fx<= start size))
-            (raise-bounds-error 'bytevector->hex-string (list bv start end))))
+                   (fx<= start end) (fx<= end size))
+            (raise-bounds-error 'bytevector->hex-string (list bv start end)))
           (%bytevector->hex-string bv
                                    start
                                    end
@@ -372,6 +378,7 @@ C_return(C_SCHEME_FALSE);")))
                            #!optional
                            string fixnum fixnum
                            -> string))
+#|
     (define bytevector->base64
       (let ((%bytevector->base64
              (foreign-lambda* scheme-object ((nonnull-bytevector bv)
@@ -515,7 +522,63 @@ for (; start < end; start += 4, buf += 4, bv += 3) {
 
 	bv[2] = ((tmp2 & 3) << 2) | tmp;
 }
-C_return(C_SCHEME_FALSE);")))
+C_return(C_SCHEME_FALSE);"))
+           (%validate-base64
+            (foreign-lambda* scheme-object ((scheme-object str)
+                                            (size_t start_char)
+                                            (size_t end)
+                                            (unsigned-byte c62)
+                                            (unsigned-byte c23)
+                                            (scheme-object rinfo))
+              "\
+size_t start = C_unfix(C_utf_position(str, C_fix(start_char)));
+char *buf = C_data_pointer(C_block_item(str, 0)) + start;
+size_t byte_len = 0;
+
+for (i = start; i < end; i += 4) {
+	if (end - i < 4) {
+		C_u_i_car(rinfo) = C_fix(i);
+		C_u_i_cdr(rinfo) = C_fix(end);
+		C_return(C_SCHEME_FALSE);
+	}
+	if (base64_to_portion(buf[0], c62, c63) < 0) {
+		C_u_i_car(rinfo) = C_fix(i);
+		C_u_i_cdr(rinfo) = C_fix(i+1);
+		C_return(C_SCHEME_FALSE);
+	}
+	if (base64_to_portion(buf[1], c62, c63) < 0) {
+		C_u_i_car(rinfo) = C_fix(i);
+		C_u_i_cdr(rinfo) = C_fix(i+2);
+		C_return(C_SCHEME_FALSE);
+	}
+	if (buf[2] == '=') {
+		if (buf[3] == '=') {
+			byte_len += 1;
+			break;
+		} else {
+			C_u_i_car(rinfo) = C_fix(i);
+			C_u_i_cdr(rinfo) = C_fix(i+2);
+			C_return(C_SCHEME_FALSE);
+		}
+	}
+	if (base64_to_portion(buf[2], c62, c63) < 0) {
+		C_u_i_car(rinfo) = C_fix(i);
+		C_u_i_cdr(rinfo) = C_fix(i + 3);
+		C_return(C_SCHEME_FALSE);
+	}
+	if (buf[3] == '=') {
+		byte_len += 2;
+		break;
+	}
+	if (base64_to_portion(buf[3], c62, c63) < 0) {
+		C_u_i_car(rinfo) = C_fix(i);
+		C_u_i_cdr(rinfo) = C_fix(i + 4);
+		C_return(C_SCHEME_FALSE);
+	}
+	byte_len += 3;
+}
+
+C_return(C_fix(byte_len));")))
         (lambda (str #!optional
                      (start 0)
                      (end #f)
@@ -532,28 +595,148 @@ C_return(C_SCHEME_FALSE);")))
                                     (fx<= end len))
               (raise-bounds-error 'base64->bytevector
                                   (list str start end)))
-            (let* ((c1 (char->integer (string-ref digits 0)))
-                   (c2 (char->integer (string-ref digits 1))))
-              (unless-unsafe-and (and (valid-extra-base64-char? c1)
-                                      (valid-extra-base64-char? c2)
-                                      (not (fx= c1 c2)))
-                (raise (condition `(exn location base64->bytevector
-                                        message "Invalid digits"
-                                        arguments (,digits)))))
-              (let ((groups (fx/ (fx- end start) 4))
-                    (junk (fxrem (fx- end start) 4)))
-                (unless-unsafe-and (fx= junk 0)
-                  (raise (condition `(exn location base64->bytevector
-                                          message "base64 string not padded"
-                                          arguments (,str ,start ,end)))))
-                (let* ((bv (make-bytevector (fx* groups 3)))
-                       (bad-idx (%base64->bytevector str start end bv c1 c2)))
-                  (when bad-idx
+            (if (fx= start end)
+                #u8()
+                (let* ((c1 (char->integer (string-ref digits 0)))
+                       (c2 (char->integer (string-ref digits 1))))
+                  (unless-unsafe-and (and (valid-extra-base64-char? c1)
+                                          (valid-extra-base64-char? c2)
+                                          (not (fx= c1 c2)))
                     (raise (condition `(exn location base64->bytevector
-                                            message "non-alphabetic character in base64"
-                                            arguments (,str ,start ,end))
-                                      `(deserialization string ,str
-                                                        start ,bad-idx
-                                                        end ,(fx+ bad-idx 4)))))
-                  bv)))))))
+                                            message "Invalid digits"
+                                            arguments (,digits)))))
+                  (let ((groups (fx/ (fx- end start) 4))
+                        (junk (fxrem (fx- end start) 4)))
+                    (unless (fx= junk 0)
+                      (raise (condition `(exn location base64->bytevector
+                                              message "base64 string not padded"
+                                              arguments (,str ,start ,end)))))
+                    (let* ((len (%validate-base64 str start end c1 c2)))
+                      (unless (fx> len 0)
+                        (raise (condition `(exn location base64->bytevector
+                                                message "invalid character"
+                                                arguments (,str ,start ,end))
+                                          `(deserialization string ,str
+                                                            start ,len
+                                                            end ,(fx+ len 1)))))
+                      (let* ((bv (make-bytevector len))
+                             (bad-idx (%base64->bytevector str start end bv c1 c2)))
+                        (when bad-idx
+                          (raise (condition `(exn location base64->bytevector
+                                                  message "non-alphabetic character in base64"
+                                                  arguments (,str ,start ,end))
+                                            `(deserialization string ,str
+                                                              start ,bad-idx
+                                                              end ,(fx+ bad-idx 4)))))
+                        bv)))))))))
+|#
+
+    (: u8-list->bytevector
+       ((list-of fixnum) #!optional
+                         fixnum
+                         (or false fixnum)
+        -> bytevector))
+    (define u8-list->bytevector
+      (let* ((%u8-list->bytevector
+              (foreign-lambda* scheme-object ((nonnull-bytevector bv)
+                                              (size_t start)
+                                              (size_t end)
+                                              (scheme-object lst)
+                                              (scheme-object return_info))
+                "\
+size_t i;
+
+for (i = 0; i < start; i++) {
+	if (C_immediatep(lst) || !C_truep(C_pairp(lst))) {
+		C_u_i_car(return_info) = C_fix(3);
+		C_return(lst);
+	}
+	lst = C_u_i_cdr(lst);
+}
+
+for (; i < end; i++, bv++) {
+	if (C_immediatep(lst) || !C_truep(C_pairp(lst))) {
+		C_u_i_car(return_info) = C_fix(3);
+		C_return(lst);
+	}
+
+	if (!C_truep(C_fixnump(C_u_i_car(lst)))) {
+		C_u_i_car(return_info) = C_fix(4);
+		C_return(C_u_i_car(lst));
+	}
+	if (C_unfix(C_u_i_car(lst)) < 0 || C_unfix(C_u_i_car(lst)) > 255) {
+		C_u_i_car(return_info) = C_fix(4);
+		C_return(C_u_i_car(lst));
+	}
+
+	*bv = C_unfix(C_u_i_car(lst));
+	lst = C_u_i_cdr(lst);
+}
+
+C_return(C_SCHEME_TRUE);"))
+             (with-error-handling
+              (lambda (lst len start end)
+                (let* ((bv (make-bytevector len))
+                       (return-info (cons 0 #f))
+                       (irritant (%u8-list->bytevector bv start end lst
+                                                       return-info)))
+                  (case (car return-info)
+                    ((0) bv)
+                    ((3) (raise-type-error irritant
+                                           'u8-list->bytevector
+                                           "pair"))
+                    ((4) (raise-type-error irritant
+                                           'u8-list->bytevector
+                                           "unsigned byte")))))))
+      (lambda (lst #!optional (start 0) (end #f))
+        (unless-unsafe-and (and (fixnum? start)
+                                (fx<= 0 start))
+          (raise-bounds-error 'u8-list->bytevector
+                              (list lst start end)))
+        (if end
+            (begin
+              (unless-unsafe-and (and (fixnum? end)
+                                      (fx<= start end))
+                (raise-bounds-error 'u8-list->bytevector
+                                    (list lst start end)))
+              (with-error-handling lst (fx- end start) start end))
+            (let* ((lst (list-tail lst start))
+                   (len (length+ lst)))
+              (unless-unsafe-and len
+                (raise-type-error lst 'u8-list->bytevector "list"))
+              (with-error-handling lst len 0 len))))))
+
+    (: bytevector->u8-list
+       (bytevector #!optional
+                   fixnum
+                   (or false fixnum)
+        -> (list-of fixnum)))
+    (define bytevector->u8-list
+      (let* ((%bytevector->u8-list
+              (foreign-lambda* scheme-object ((nonnull-bytevector bv)
+                                              (size_t start)
+                                              (size_t end)
+                                              (scheme-object head))
+                "\
+C_word lst = head;
+bv += start;
+
+for (; start < end; start++, bv++) {
+	C_u_i_car(lst) = C_fix(*bv);
+	lst = C_u_i_cdr(lst);
+}
+C_return(head);")))
+        (lambda (bv #!optional (start 0) (end #f))
+          (check! bytevector? bv 'bytevector->u8-list "bytevector")
+          (let* ((len (bytevector-length bv))
+                 (end (or end len)))
+            (unless-unsafe-and (and (fixnum? start)
+                                    (fixnum? end)
+                                    (fx<= 0 start)
+                                    (fx<= start end)
+                                    (fx<= end len))
+             (raise-bounds-error 'bytevector->u8-list
+                                 (list bv start end)))
+            (%bytevector->u8-list bv start end
+                                  (make-list (fx- end start)))))))
 ))
