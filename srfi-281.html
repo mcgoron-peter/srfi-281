@@ -581,7 +581,8 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   <a href="https://srfi.schemers.org/srfi-207/">SRFI 207</a>
   on account of their general applicability to bytevectors.
   They now take <var>start</var> and <var>end</var>
-  arguments.
+  arguments. However, the requirement that the procedures must ignore
+  spaces in their input has been removed for efficiency reasons.
 </p>
 
 <div class="feature">
@@ -670,8 +671,7 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <p>
   Returns a newly allocated bytevector, where each sequential pair of hexadecimal
   digits in <var>string</var> between <var>start</var> and <var>end</var> is
-  converted into the corresponding byte. Characters satisfying
-  <code>char-whitespace?</code> are ignored.
+  converted into the corresponding byte.
 </p>
 
 <p>
@@ -727,7 +727,6 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   Decodes the base64-encoded <var>string</var> between <var>start</var>
   and <var>end</var> into a bytevector. The first and second characters in
   <var>digits</var> are decoded into the numbers 62 and 63, respectively.
-  Characters satisfying <code>char-whitespace?</code> are ignored.
 </p>
 
 <p>This description defers to RFC 4648.</p>
@@ -738,6 +737,10 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   href="#deserialization-errorp"><code>deserializtion-error?</code></a>
   is raised with the invalid part of the string as the start and end.
 </p>
+
+<pre
+><code class="example-code">(bytevector->base64 (string->utf8 "R7RS"))</code> ⇒ &quot;UjdSUw==&quot;</code>
+<code  class="example-code">(base64->bytevector &quot;U2NoZW1l&quot;)</code> ⇒ #u8(83 99 104 101 109 101)</code></pre>
 
 <h3 id="u8-library"><a href="#u8-library"></a> Unsigned 8-bit integer libraries</h3>
 
@@ -1659,12 +1662,16 @@ BOM in the encoding is decoded as a regular character.
   <a href="https://srfi.schemers.org/srfi-252/">252</a>.
   This uses all optional features (and <code>eval</code>), and in
   full form has millions of assertions. One may wish to comment
-  out parts of the test suite when using it for automated testing.
+  out parts of the test suite when using it for automated testing. To run the
+  test suite, run <code>tests/run.scm</code>, an
+  <span class="report-name">R<sup>7</sup>RS</span> script. If you want to
+  run the test cases interactively in a REPL, you can include the tests
+  from <code>tests/definitions.scm</code>.
 </p>
 
 <p>
-  The sample implementation has been tested on Chibi (bleeding edge from git)
-  and Gauche 0.9.15.
+  The sample implementation has been tested on Chibi (bleeding edge from git),
+  Gauche 0.9.15, and Sagittarius 0.9.14.
 </p>
 
 <h2 id="acknowledgements"><a href="#acknowledgements"></a> Acknowledgements</h2>

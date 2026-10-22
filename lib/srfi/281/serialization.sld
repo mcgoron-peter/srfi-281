@@ -22,6 +22,7 @@
                    error?
                    make-error
                    make-message-condition
+                   condition-message
                    make-who-condition
                    make-irritants-condition)
              (srfi 281 condition))
@@ -37,13 +38,13 @@
        (define (deserialization-error? obj)
          (and (error? obj) (deserialization-condition? obj)))
        (define (raise-deserialization-error who message bv start end)
-         (condition (make-error)
-                    (make-deserialization-condition)
-                    (make-string-range-condition bv start end)
-                    (make-message-condition message)
-                    (make-who-condition who)))))
+         (raise (condition (make-error)
+                           (make-deserialization-condition)
+                           (make-string-range-condition bv start end)
+                           (make-message-condition message)
+                           (make-who-condition who))))))
     (else
-     (export deserialization-error-bytevector
+     (export deserialization-error-string
              deserialization-error-start
              deserialization-error-end
              deserialization-error-message

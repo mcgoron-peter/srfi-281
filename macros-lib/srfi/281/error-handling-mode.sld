@@ -15,7 +15,7 @@
     (chibi (import (scheme base) (chibi)))
     (gauche (import (scheme base) (gauche base)))
     (gambit (import (gambit)))
-    ((library (rnrs bytevectors)) (import (rnrs bytevectors))))
+    ((library (rnrs io ports)) (import (rnrs io ports))))
   (export error-handling-mode)
   (cond-expand
     ((or chicken mit chibi gauche)

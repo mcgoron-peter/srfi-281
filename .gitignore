@@ -1,0 +1,11 @@
+*.build.sh
+*.so
+*.import.scm
+*.install.sh
+*.o
+*.log
+*.link
+*.c
+*.inline
+*.types
+

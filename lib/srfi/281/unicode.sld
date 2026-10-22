@@ -3,7 +3,8 @@
 ; SPDX-License-Identifier: MIT
 
 (define-library (srfi 281 unicode)
-  (import (scheme base) (scheme case-lambda) (srfi 143)
+  (import (except (scheme base) utf8->string string->utf8)
+          (scheme case-lambda) (srfi 143)
           (only (srfi 281 base) endianness?)
           (srfi 281 u16))
   (export error-handling-mode?
@@ -36,11 +37,11 @@
        (define (unicode-decoding-error? obj)
          (and (error? obj) (unicode-decoding-condition? obj)))
        (define (raise-unicode-decoding-error who message bv start end)
-         (condition (make-error)
-                    (make-unicode-decoding-condition)
-                    (make-bytevector-range-condition bv start end)
-                    (make-message-condition message)
-                    (make-who-condition who)))))
+         (raise (condition (make-error)
+                           (make-unicode-decoding-condition)
+                           (make-bytevector-range-condition bv start end)
+                           (make-message-condition message)
+                           (make-who-condition who))))))
     (else
      (export unicode-decoding-error-bytevector
              unicode-decoding-error-start
