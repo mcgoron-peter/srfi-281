@@ -47,7 +47,6 @@
 
 (include "u8-list-to-bytevector.scm")
 (test-u8-list->bytevector-and-bytevector->u8-list)
-(test-u8-list-r6rs-examples)
 
 (include "s8.scm")
 (test-bytevector-s8-ref-negative)
@@ -153,5 +152,8 @@
 
 (string->utf32-and-utf32->string-inverses)
 (test-utf32-bom)
+
+(include "r6rs-examples.scm")
+(test-u8-list-r6rs-examples)
 
 (test-end "SRFI 281")
