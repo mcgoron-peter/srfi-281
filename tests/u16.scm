@@ -16,15 +16,3 @@
   (test-group "exhaustive test for u16, little endian"
     (u16:exhaustive-test 'little)))
 
-(define (bytevector-u16-random)
-  (test-group "u32 random test"
-    (test-property
-     (lambda (endianness word len)
-       (let* ((bv (make-bytevector (* len 4) 0))
-              (idx ((make-random-integer-generator 0 len))))
-         (bytevector-u16-set! bv idx word endianness)
-         (= (bytevector-u16-ref bv idx endianness)
-            word)))
-     (list (endianness-generator)
-           (make-random-unsigned-integer-generator 2)
-           (make-random-integer-generator 1 100)))))
