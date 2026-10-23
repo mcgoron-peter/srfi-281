@@ -70,15 +70,21 @@
 (test-bytevector->sint-list-and-sint-list->bytevector-inverses)
 (set! skip-current-tests? #f)
 
+(include "u16.scm")
 (when skip-big-tests?
   (set! skip-current-tests? #t))
-(include "u16.scm")
 (bytevector-u16-big-exhaustive)
 (bytevector-u16-little-exhaustive)
+(set! skip-current-tests? #f)
+(bytevector-u16-random)
+
 (include "s16.scm")
+(when skip-big-tests?
+  (set! skip-current-tests? #t))
 (bytevector-s16-big-exhaustive)
 (bytevector-s16-little-exhaustive)
 (set! skip-current-tests? #f)
+(bytevector-s16-random)
 
 (include "u32.scm")
 (test-u32-property)
@@ -155,5 +161,11 @@
 
 (include "r6rs-examples.scm")
 (test-u8-list-r6rs-examples)
+(test-u8-s8-r6rs-example-1)
+(test-u8-s8-r6rs-example-2)
+(test-r6rs-uint-sint-examples)
+(test-r6rs-u16-examples)
+(test-r6rs-u32-examples)
+(test-r6rs-u64-examples)
 
 (test-end "SRFI 281")
