@@ -8,6 +8,7 @@
           (chicken condition)
           (chicken foreign)
           (chicken fixnum)
+          (chicken bitwise)
           (srfi 1))
   (export endianness? native-endianness make-bytevector bytevector
           bytevector-length bytevector-u8-ref bytevector-u8-set!
@@ -22,7 +23,9 @@
           u8-list->bytevector bytevector->u8-list
           bytevector-s8-ref bytevector-s8-set!
           bytevector-u16-ref bytevector-u16-native-ref
-          bytevector-u16-set! bytevector-u16-native-set!)
+          bytevector-u16-set! bytevector-u16-native-set!
+          bytevector-sint-set! bytevector-sint-ref
+          bytevector-uint-set! bytevector-uint-ref)
 
   (cond-expand
     (little-endian
@@ -1078,4 +1081,91 @@ C_return(C_fix(bytevector_u16_regular_set(bv, k, cv)));")))
                   ((little) (c (%bytevector-u16-reversed-set bv k n)))
                   (else (raise-type-error endianness 'bytevector-u16-set!
                                           "endianness")))))))))
+
+      (: bytevector-uint-ref
+         (bytevector fixnum symbol fixnum --> integer))
+      (define (bytevector-uint-ref bv k endianness size)
+        (check! bytevector? bv 'bytevector-uint-ref "bytevector")
+        (unless-unsafe-and (and (fixnum? k)
+                                (fx<= 0 k)
+                                (fx<= k (fx- (bytevector-length bv)
+                                             size)))
+          (raise-index-error 'bytevector-uint-ref
+                             bv
+                             k))
+        (unless-unsafe-and (and (fixnum? size)
+                                (fx>= size 1))
+          (raise-type-error k 'bytevector-uint-ref "index"))
+        (case endianness
+          ((big)
+           (do ((i 0 (fx+ i 1))
+                (k k (fx+ k 1))
+                (n 0 (bitwise-ior (arithmetic-shift n 8)
+                                  (bytevector-u8-ref bv k))))
+               ((fx= i size) n)))
+          ((little)
+           (do ((i 0 (fx+ i 1))
+                (k (fx+ k (fx- size 1)) (fx- k 1))
+                (n 0 (bitwise-ior (arithmetic-shift n 8)
+                                  (bytevector-u8-ref bv k))))
+               ((fx= i size) n)))
+          (else (raise-type-error endianness 'bytevector-uint-ref "endianness"))))
+
+      (: bytevector-sint-ref
+         (bytevector fixnum symbol fixnum --> integer))
+      (define (bytevector-sint-ref bv k endianness size)
+        (let ((v (bytevector-uint-ref bv k endianness size)))
+          (if (= (integer-length v) (* size 8))
+              (bitwise-ior (arithmetic-shift -1 (* size 8))
+                           v))))
+
+      (: bytevector-uint-set!
+         (bytevector fixnum integer symbol fixnum -> undefined))
+      (define (bytevector-uint-set! bv k n endianness size)
+        (check! bytevector? bv 'bytevector-uint-set! "bytevector")
+        (unless-unsafe-and (and (fixnum? k)
+                                (fx<= 0 k)
+                                (fx<= k (fx- (bytevector-length bv)
+                                             size)))
+          (raise-index-error 'bytevector-uint-set!
+                             bv
+                             k))
+        (unless-unsafe-and (and (fixnum? size)
+                                (fx>= size 1))
+          (raise-type-error k 'bytevector-uint-set! "index"))
+        (unless-unsafe-and (and (exact-integer? size)
+                                (fx<= 0 n)
+                                (fx<= (integer-length n)
+                                      (fx* size 8)))
+          (raise-type-error n 'bytevector-uint-set! "sized number"))
+        (case endianness
+          ((little)
+           (do ((i 0 (fx+ i 1))
+                (k k (fx+ k 1))
+                (n n (arithmetic-shift n -8)))
+               ((fx= i size))
+             (bytevector-u8-set! bv k (bitwise-and n #xFF))))
+          ((big)
+           (do ((i 0 (fx+ i 1))
+                (k (fx+ k (fx- size 1)) (fx- k 1))
+                (n n (arithmetic-shift n -8)))
+               ((fx= i size))
+             (bytevector-u8-set! bv k (bitwise-and n #xFF))))
+          (else (raise-type-error endianness
+                                  'bytevector-uint-set!
+                                  "endianness"))))
+      (: bytevector-sint-set!
+         (bytevector fixnum symbol integer fixnum -> undefined))
+      (define (bytevector-sint-set! bv k n endianness size)
+        (check! exact-integer? n 'bytevector-sint-set! "exact integer")
+        (check! fixnum? size 'bytevector-sint-set! "size")
+        (unless (<= (integer-length n) (* size 8))
+          (raise-type-error n 'bytevector-sint-set! "exact integer of size"))
+        (if (negative? n)
+            (bytevector-uint-set! bv
+                                  k
+                                  (+ (bitwise-not n) 1)
+                                  endianness
+                                  size)
+            (bytevector-uint-set! bv k n endianness size)))
 ))
