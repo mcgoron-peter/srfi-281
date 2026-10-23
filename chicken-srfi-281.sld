@@ -25,7 +25,9 @@
           bytevector-u16-ref bytevector-u16-native-ref
           bytevector-u16-set! bytevector-u16-native-set!
           bytevector-sint-set! bytevector-sint-ref
-          bytevector-uint-set! bytevector-uint-ref)
+          bytevector-uint-set! bytevector-uint-ref
+          bytevector->uint-list uint-list->bytevector
+          bytevector->sint-list sint-list->bytevector)
 
   (cond-expand
     (little-endian
@@ -1117,8 +1119,26 @@ C_return(C_fix(bytevector_u16_regular_set(bv, k, cv)));")))
         (let ((v (bytevector-uint-ref bv k endianness size)))
           (if (= (integer-length v) (* size 8))
               (bitwise-ior (arithmetic-shift -1 (* size 8))
-                           v))))
+                           v)
+              v)))
 
+      (define (%bytevector-arb-set! bv k n endianness size)
+        (case endianness
+          ((little)
+           (do ((i 0 (fx+ i 1))
+                (k k (fx+ k 1))
+                (n n (arithmetic-shift n -8)))
+               ((fx= i size))
+             (bytevector-u8-set! bv k (bitwise-and n #xFF))))
+          ((big)
+           (do ((i 0 (fx+ i 1))
+                (k (fx+ k (fx- size 1)) (fx- k 1))
+                (n n (arithmetic-shift n -8)))
+               ((fx= i size))
+             (bytevector-u8-set! bv k (bitwise-and n #xFF))))
+          (else (raise-type-error endianness
+                                  'bytevector-uint-set!
+                                  "endianness"))))
       (: bytevector-uint-set!
          (bytevector fixnum integer symbol fixnum -> undefined))
       (define (bytevector-uint-set! bv k n endianness size)
@@ -1138,34 +1158,96 @@ C_return(C_fix(bytevector_u16_regular_set(bv, k, cv)));")))
                                 (fx<= (integer-length n)
                                       (fx* size 8)))
           (raise-type-error n 'bytevector-uint-set! "sized number"))
-        (case endianness
-          ((little)
-           (do ((i 0 (fx+ i 1))
-                (k k (fx+ k 1))
-                (n n (arithmetic-shift n -8)))
-               ((fx= i size))
-             (bytevector-u8-set! bv k (bitwise-and n #xFF))))
-          ((big)
-           (do ((i 0 (fx+ i 1))
-                (k (fx+ k (fx- size 1)) (fx- k 1))
-                (n n (arithmetic-shift n -8)))
-               ((fx= i size))
-             (bytevector-u8-set! bv k (bitwise-and n #xFF))))
-          (else (raise-type-error endianness
-                                  'bytevector-uint-set!
-                                  "endianness"))))
+        (%bytevector-arb-set! bv k n endianness size))
+
       (: bytevector-sint-set!
          (bytevector fixnum symbol integer fixnum -> undefined))
       (define (bytevector-sint-set! bv k n endianness size)
-        (check! exact-integer? n 'bytevector-sint-set! "exact integer")
-        (check! fixnum? size 'bytevector-sint-set! "size")
-        (unless (<= (integer-length n) (* size 8))
-          (raise-type-error n 'bytevector-sint-set! "exact integer of size"))
-        (if (negative? n)
-            (bytevector-uint-set! bv
-                                  k
-                                  (+ (bitwise-not n) 1)
-                                  endianness
-                                  size)
-            (bytevector-uint-set! bv k n endianness size)))
+        (check! bytevector? bv 'bytevector-sint-set! "bytevector")
+        (unless-unsafe-and (and (fixnum? k)
+                                (fx<= 0 k)
+                                (fx<= k (fx- (bytevector-length bv)
+                                             size)))
+          (raise-index-error 'bytevector-sint-set!
+                             bv
+                             k))
+        (unless-unsafe-and (and (fixnum? size)
+                                (fx>= size 1))
+          (raise-type-error k 'bytevector-sint-set! "index"))
+        (unless-unsafe-and (and (exact-integer? size)
+                                (fx<= (fx+ 1 (integer-length n))
+                                      (fx* size 8)))
+          (raise-type-error n 'bytevector-sint-set! "sized number"))
+        (%bytevector-arb-set! bv k n endianness size))
+
+      ;;; TODO: Special-case these procedures for numbers that are known
+      ;;; to fit in a fixnum.
+
+      (define (make-list->bytevector set! who)
+        (lambda (%lst endianness size #!optional (start 0) (end #f))
+          (define (do-bytevector lst len)
+            (do ((bv (make-bytevector (fx* len size)))
+                 (k 0 (fx+ k size))
+                 (lst lst (cdr lst)))
+                ((fx= k (bytevector-length bv)) bv)
+              (set! bv k (car lst) endianness size)))
+  
+          (check! fixnum? size who "fixnum")
+          (unless-unsafe-and (fx> size 0)
+            (raise-type-error size who "positive fixnum"))
+          (unless-unsafe-and (and (fixnum? start) (fx<= 0 start))
+            (raise-bounds-error who (list %lst start)))
+          (let ((lst (list-tail %lst start)))
+            (cond
+              (end
+               (unless-unsafe-and (and (fixnum? end) (fx<= start end))
+                 (raise-bounds-error who
+                                     (list lst start end)))
+               (do-bytevector lst (fx- end start)))
+              ((length+ lst)
+               => (lambda (len)
+                    (do-bytevector lst len)))
+              (else
+                (raise-type-error lst who "list"))))))
+
+      (: uint-list->bytevector
+         ((list-of integer) symbol fixnum
+          #!optional fixnum (or false fixnum)
+          -> bytevector))
+      (define uint-list->bytevector
+        (make-list->bytevector bytevector-uint-set! 'uint-list->bytevector))
+
+      (: sint-list->bytevector
+         ((list-of integer) symbol fixnum
+          #!optional fixnum (or false fixnum)
+          -> bytevector))
+      (define sint-list->bytevector
+        (make-list->bytevector bytevector-sint-set! 'sint-list->bytevector))
+
+      (define (make-bytevector->list ref who)
+        (lambda (bv endianness size #!optional (start 0) (end #f))
+          (check! bytevector? bv who "bytevector")
+          (let* ((len (bytevector-length bv))
+                 (end (or end len)))
+            (unless-unsafe-and (and (fixnum? start) (fixnum? end)
+                                    (fx<= 0 start)
+                                    (fx<= start end)
+                                    (fx<= end len))
+              (raise-bounds-error who (list bv start end)))
+            (let loop ((start start))
+              (if (fx= start end)
+                  '()
+                  (cons (ref bv start endianness size)
+                        (loop (fx+ start size))))))))
+
+      (: bytevector->uint-list
+         (bytevector symbol fixnum fixnum (or fixnum false)
+          -> (list-of integer)))
+      (define bytevector->uint-list
+        (make-bytevector->list bytevector-uint-ref 'bytevector->uint-list))
+      (: bytevector->sint-list
+         (bytevector symbol fixnum fixnum (or fixnum false)
+          -> (list-of integer)))
+      (define bytevector->sint-list
+        (make-bytevector->list bytevector-sint-ref 'bytevector->sint-list))
 ))
