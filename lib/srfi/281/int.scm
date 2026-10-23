@@ -2,11 +2,16 @@
 ;
 ; SPDX-License-Identifier: MIT
 
+(define (uint-fits-in-fixnum? x)
+  (fx<? x fx-width))
+(define (sint-fits-in-fixnum? x)
+  (fx<=? x fx-width))
+
 (define (bytevector-uint-ref bv k e size)
   (unless (and (exact-integer? size)
                (positive? size))
     (error "size: not a positive exact integer" size))
-  (if (fixnum? size)
+  (if (uint-fits-in-fixnum? size)
       ((multibyte-ref size #t) bv k e)
       ((multibyte-ref size #f) bv k e)))
 
@@ -21,7 +26,7 @@
     (error "size: not a positive exact integer" size))
   (let ((lo 0)
         (hi (- (expt 256 size) 1)))
-    (if (fixnum? size)
+    (if (sint-fits-in-fixnum? size)
         ((multibyte-set size lo hi #t) bv k n e)
         ((multibyte-set size lo hi #f) bv k n e)))
   (unless (<= 0 k (+ k size) (bytevector-length bv))
