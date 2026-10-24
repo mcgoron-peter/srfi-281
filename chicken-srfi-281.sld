@@ -552,245 +552,176 @@ static inline void reverse(void *p, size_t len)
 	}
 }
 
-static uint16_t bytevector_u16_regular_ref(C_word bv, C_word n, int *err)
+static int check_bytevector_args(C_word bv, C_word n, size_t size)
 {
 	size_t ind;
-	uint16_t v;
-	if (C_immediatep(bv) || !C_bytevectorp(bv)) {
-		*err = 0x10000;
-		return 0;
-	}
 
-	if (!C_truep(C_fixnump(n)) || C_unfix(n) < 0 || C_unfix(n) > SIZE_MAX) {
-		*err = 0x10001;
-		return 0;
-	}
-
-	ind = C_unfix(n);
-	if (C_u_i_bytevector_length(bv) == 0
-	    || ind >= C_u_i_bytevector_length(bv) - 1) {
-		*err = 0x10002;
-		return 0;
-	}
-
-	memcpy(&v, C_c_string(bv) + ind, sizeof(v));
-	return v;
-}
-
-static unsigned bytevector_u16_regular_set(C_word bv, C_word k, uint16_t cv)
-{
-	size_t ind;
 	if (C_immediatep(bv) || !C_bytevectorp(bv)) {
 		return 1;
 	}
 
-	if (!C_truep(C_fixnump(k)) || C_unfix(k) < 0 || C_unfix(k) > SIZE_MAX) {
+	if (!C_truep(C_fixnump(n)) || C_unfix(n) < 0 || C_unfix(n) > SIZE_MAX) {
 		return 2;
 	}
 
-	ind = C_unfix(k);
+	ind = C_unfix(n);
 	if (C_u_i_bytevector_length(bv) == 0
-	    || ind >= C_u_i_bytevector_length(bv) - 1) {
-		return 2;
+	    || ind > C_u_i_bytevector_length(bv) - size) {
+		return 3;
 	}
 
-	memcpy(C_c_string(bv) + ind, &cv, 2);
 	return 0;
 }")
 
-    (: bytevector-u16-ref (bytevector fixnum symbol --> fixnum))
-    (define bytevector-u16-ref
-      (let* ((%bytevector-u16-regular-ref
-              (foreign-lambda* scheme-object ((scheme-object bv)
-                                              (scheme-object n))
-                "\
-int e = 0;
-uint16_t v = bytevector_u16_regular_ref(bv, n, &e);
-if (e != 0)
-	C_return(C_fix(e));
-else
-	C_return(C_fix(v));"))
-             (%bytevector-u16-reversed-ref
-              (foreign-lambda* scheme-object ((scheme-object bv)
-                                              (scheme-object n))
-                "\
-int e = 0;
-uint16_t v = bytevector_u16_regular_ref(bv, n, &e);
+    (define-syntax create-ref
+      ;; (create-regular-ref c-type limit reverse?)
+      (ir-macro-transformer
+        (lambda (exp rename compare)
+          (let ((ctype (list-ref exp 1))
+                (limit (number->string (list-ref exp 2)))
+                (reverse (if (list-ref exp 3)
+                             "reverse(&v, sizeof v);"
+                             "")))
+            (define inner #<#EOF
+#{ctype} v;
+int e = check_bytevector_args(bv, n, sizeof v);
+size_t i;
+
 if (e != 0) {
-	C_return(C_fix(e));
+	C_return(C_fix(#{limit} + e));
 } else {
-	reverse(&v, 2);
+	memcpy(&v, C_c_string(bv) + C_unfix(n), sizeof v);
+	#reverse
 	C_return(C_fix(v));
-}")))
-       (let-syntax ((c
-                     (syntax-rules ()
-                       ((_ v)
-                        (let ((r v))
-                          (case r
-                            ((#x10000)
-                             (raise-type-error bv 'bytevector-u16-ref "bytevector"))
-                            ((#x10001)
-                             (raise-index-error 'bytevector-u16-ref bv k))
-                            (else r)))))))
-         (lambda (bv k endianness)
-           (cond-expand
-             (little-endian
-               (case endianness
-                 ((little) (c (%bytevector-u16-regular-ref bv k)))
-                 ((big) (c (%bytevector-u16-reversed-ref bv k)))
-                 (else (raise-type-error endianness
-                                         'bytevector-u16-ref
-                                         "endianness"))))
-             (big-endian
-               (case endianness
-                 ((big) (c (%bytevector-u16-regular-ref bv k)))
-                 ((little) (c (%bytevector-u16-reversed-ref bv k)))
-                 (else (raise-type-error endianness
-                                         'bytevector-u16-ref
-                                         "endianness")))))))))
+}
+EOF
+)
+            `(foreign-lambda* scheme-object ((scheme-object bv)
+                                             (scheme-object n))
+               ,inner)))))
 
-    (: bytevector-u16-native-ref (bytevector fixnum --> fixnum))
-    (define bytevector-u16-native-ref
-      (let ((%bytevector-u16-native-ref
-             (foreign-lambda* scheme-object ((scheme-object bv)
-                                             (scheme-object k))
-               "\
-size_t ind;
-uint16_t *vp;
-if (C_immediatep(bv) || !C_bytevectorp(bv)) {
-	C_return(C_fix(0x10000));
+    (define-syntax create-set
+      ;; (create-regular-set c-type lolim hilim reverse?)
+      (ir-macro-transformer
+        (lambda (exp inject compare)
+          (let ((ctype (list-ref exp 1))
+                (lolim (number->string (list-ref exp 2)))
+                (hilim (number->string (list-ref exp 3)))
+                (reverse (if (list-ref exp 4)
+                             "reverse(&cv, sizeof cv);"
+                             "")))
+            (define inner #<#EOF
+#ctype cv;
+int e = check_bytevector_args(bv, n, sizeof cv);
+if (!C_truep(C_fixnump(v)) || C_unfix(v) < #lolim || C_unfix(v) > #hilim) {
+	e = 3;
 }
 
-if (!C_truep(C_fixnump(k)) || C_unfix(k) < 0 || C_unfix(k) > SIZE_MAX) {
-	C_return(C_fix(0x10001));
+if (e == 0) {
+	cv = C_unfix(v);
+	#reverse
+	memcpy(C_c_string(bv) + C_unfix(n), &cv, sizeof(cv));
 }
-
-ind = C_unfix(k);
-if (C_u_i_bytevector_length(bv) == 0
-    || ind >= C_u_i_bytevector_length(bv) - 1) {
-	C_return(C_fix(0x10001));
-}
-
-if (ind % 2 != 0) {
-	C_return(C_fix(0x10002));
-}
-
-vp = (uint16_t *)(C_c_string(bv) + ind);
-C_return(C_fix(*vp));")))
-        (lambda (bv k)
-          (let ((r (%bytevector-u16-native-ref bv k)))
-            (case r
-              ((#x10000)
-               (raise-type-error bv 'bytevector-u16-native-ref "bytevector"))
-              ((#x10001)
-               (raise-index-error 'bytevector-u16-native-ref bv k))
-              ((#x10002)
-               (raise-unaligned-error 'bytevector-u16-native-ref k 2))
-              (else r))))))
-
-    (: bytevector-u16-native-set! (bytevector fixnum fixnum -> undefined))
-    (define bytevector-u16-native-set!
-      (let ((%bytevector-u16-native-set
-             (foreign-lambda* scheme-object ((scheme-object bv)
-                                             (scheme-object k)
+C_return(C_fix(e));
+EOF
+)
+            `(foreign-lambda* scheme-object ((scheme-object bv)
+                                             (scheme-object n)
                                              (scheme-object v))
-               "\
-size_t ind;
-uint16_t *vp;
+               ,inner)))))
 
-if (C_immediatep(bv) || !C_bytevectorp(bv)) {
-	C_return(C_fix(1));
-}
+    (define-syntax make-fixnum-ref
+      (syntax-rules ()
+        ((_ ctype lolim hilim ref set native-ref native-set)
+         (begin
+           (: ref (bytevector fixnum symbol --> fixnum))
+           (define ref
+             (let ((%regular-ref (create-ref ctype hilim #f))
+                   (%reversed-ref (create-ref ctype hilim #t)))
+               (lambda (bv k endianness)
+                 (let-syntax ((c     ; (c expression)
+                               (ir-macro-transformer
+                                 (lambda (exp inject compare)
+                                   (let ((v (list-ref exp 1))
+                                         (bv (list-ref exp 2))
+                                         (k (list-ref exp 3)))
+                                     `(let ((r ,v))
+                                        (case r
+                                          ((,(fx+ hilim 2))
+                                           (raise-type-error ,bv
+                                                             (quote ref)
+                                                             "bytevector"))
+                                          ((,(fx+ hilim 3))
+                                           (raise-index-error (quote ref)
+                                                              ,bv
+                                                              ,k))
+                                          (else r))))))))
+                   (cond-expand
+                     (little-endian
+                       (case endianness
+                         ((little) (c (%regular-ref bv k) bv k))
+                         ((big) (c (%reversed-ref bv k) bv k))
+                         (else (raise-type-error endianness
+                                                 (quote ref)
+                                                 "endianness"))))
+                     (big-endian
+                       (case endianness
+                         ((big) (c (%regular-ref bv k) bv k))
+                         ((little) (c (%reversed-ref bv k) bv k))
+                         (else (raise-type-error endianness
+                                                 (quote ref)
+                                                 "endianness")))))))))
+          (: set (bytevector fixnum fixnum symbol -> undefined))
+          (define set
+            (let ((%regular-set
+                   (create-set ctype lolim hilim #f))
+                  (%reverse-set
+                   (create-set ctype lolim hilim #t)))
+              (lambda (bv k n endianness)
+                (let-syntax ((c
+                              (syntax-rules ()
+                                ((_ v)
+                                 (let ((r v))
+                                   (case r
+                                     ((0) (void))
+                                     ((1)
+                                      (raise-type-error bv (quote set)
+                                                        "bytevector"))
+                                     ((2)
+                                      (raise-index-error (quote set) bv k))
+                                     ((3)
+                                      (raise-type-error n (quote set)
+                                                        "unsigned 16 bit word"))))))))
+                  (cond-expand
+                    (little-endian
+                      (case endianness
+                        ((little) (c (%regular-set bv k n)))
+                        ((big) (c (%reverse-set bv k n)))
+                        (else (raise-type-error endianness
+                                                (quote set)
+                                                "endianness"))))
+                    (big-endian
+                      (case endianness
+                        ((big) (c (%regular-set bv k n)))
+                        ((little) (c (%reverse-set bv k n)))
+                        (else (raise-type-error endianness
+                                                (quote set)
+                                                "endianness")))))))))
+          ;;; Native refs and sets are just wrappers around the regular refs
+          ;;; and sets. Presumably a Sufficiently Smart Compiler™ would be
+          ;;; able to optimize these inline, but CHICKEN doesn't do that.
+          (: native-ref (bytevector fixnum --> fixnum))
+          (define (native-ref bv k)
+            (ref bv k (native-endianness)))
+          (: native-set (bytevector fixnum fixnum -> undefined))
+          (define (native-set bv k n)
+            (set bv k n (native-endianness)))))))
 
-if (!C_truep(C_fixnump(k)) || C_unfix(k) < 0 || C_unfix(k) > SIZE_MAX) {
-	C_return(C_fix(2));
-}
-
-ind = C_unfix(k);
-if (C_u_i_bytevector_length(bv) == 0
-    || ind >= C_u_i_bytevector_length(bv) - 1) {
-	C_return(C_fix(2));
-}
-
-if (ind % 2 != 0) {
-	C_return(C_fix(3));
-}
-
-if (!C_truep(C_fixnump(v)) || C_unfix(v) < 0 || C_unfix(v) > 0xFFFF) {
-	C_return(C_fix(4));
-}
-
-vp = (uint16_t *)(C_c_string(bv) + ind);
-
-*vp = C_unfix(v);
-C_return(C_fix(0));")))
-        (lambda (bv k v)
-          (let ((r (%bytevector-u16-native-set bv k v)))
-            (case r
-              ((0) (void))
-              ((1) 
-               (raise-type-error bv 'bytevector-u16-native-set!
-                                 "bytevector"))
-              ((2) (raise-index-error 'bytevector-u16-native-set! bv k))
-              ((3) (raise-unaligned-error 'bytevector-u16-native-set! k 2))
-              ((4) (raise-type-error v 'bytevector-u16-native-set!
-                                     "unsigned 16-bit word")))))))
-
-    (: bytevector-u16-set! (bytevector fixnum fixnum symbol -> undefined))
-    (define bytevector-u16-set!
-      (let* ((%bytevector-u16-regular-set
-              (foreign-lambda* scheme-object ((scheme-object bv)
-                                              (scheme-object k)
-                                              (scheme-object v))
-                "\
-uint16_t cv;
-
-if (!C_truep(C_fixnump(v)) || C_unfix(v) < 0 || C_unfix(v) > 0xFFFF) {
-	C_return(C_fix(3));
-}
-cv = C_unfix(v);
-C_return(C_fix(bytevector_u16_regular_set(bv,k,cv)));"))
-             (%bytevector-u16-reversed-set
-              (foreign-lambda* scheme-object ((scheme-object bv)
-                                              (scheme-object k)
-                                              (scheme-object v))
-                "\
-uint16_t cv;
-
-if (!C_truep(C_fixnump(v)) || C_unfix(v) < 0 || C_unfix(v) > 0xFFFF) {
-	C_return(C_fix(3));
-}
-cv = C_unfix(v);
-reverse(&cv, 2);
-C_return(C_fix(bytevector_u16_regular_set(bv, k, cv)));")))
-        (lambda (bv k n endianness)
-          (let-syntax ((c
-                        (syntax-rules ()
-                          ((_ v)
-                           (let ((r v))
-                             (case r
-                               ((0) (void))
-                               ((1)
-                                (raise-type-error bv 'bytevector-u16-set!
-                                                  "bytevector"))
-                               ((2)
-                                (raise-index-error 'bytevector-u16-set! bv k))
-                               ((3)
-                                (raise-type-error n 'bytevector-u16-set!
-                                                  "unsigned 16 bit word"))))))))
-            (cond-expand
-              (little-endian
-                (case endianness
-                  ((little) (c (%bytevector-u16-regular-set bv k n)))
-                  ((big) (c (%bytevector-u16-reversed-set bv k n)))
-                  (else (raise-type-error endianness 'bytevector-u16-set!
-                                          "endianness"))))
-              (big-endian
-                (case endianness
-                  ((big) (c (%bytevector-u16-regular-set bv k n)))
-                  ((little) (c (%bytevector-u16-reversed-set bv k n)))
-                  (else (raise-type-error endianness 'bytevector-u16-set!
-                                          "endianness")))))))))
+      (make-fixnum-ref "uint16_t" 0 #xFFFF
+                       bytevector-u16-ref
+                       bytevector-u16-set!
+                       bytevector-u16-native-ref
+                       bytevector-u16-native-set!)
 
       (: bytevector-uint-ref
          (bytevector fixnum symbol fixnum --> integer))
@@ -869,7 +800,7 @@ C_return(C_fix(bytevector_u16_regular_set(bv, k, cv)));")))
         (%bytevector-arb-set! bv k n endianness size))
 
       (: bytevector-sint-set!
-         (bytevector fixnum symbol integer fixnum -> undefined))
+         (bytevector fixnum integer symbol fixnum -> undefined))
       (define (bytevector-sint-set! bv k n endianness size)
         (check! bytevector? bv 'bytevector-sint-set! "bytevector")
         (unless-unsafe-and (and (fixnum? k)
