@@ -151,11 +151,7 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
   This SRFI implements a modified version of the <span
   class="report-name">R<sup>6</sup>RS</span>’s <code>(rnrs bytevectors
   (6))</code> library, which has procedures for the serialization and deserialization
-  of numbers into bytevectors, and conversion to/from Unicode. It also
-  includes some procedures from
-  <a href="https://srfi.schemers.org/srfi-207/">SRFI 207</a>
-  that are relevant to all bytevectors, such as serialization/deserialization
-  into strings, and order predicates.
+  of numbers into bytevectors, and conversion to/from Unicode.
 </p>
 
 <h2 id="toc">Table of contents</h2>
@@ -176,7 +172,6 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
       <li><a href="#composite-library"> Composite library</a></li>
       <li><a href="#base-library"> Base library</a></li>
       <li><a href="#endianness-library"> Endianness library</a></li>
-      <li><a href="#serialization-library"> Serialization library</a></li>
       <li><a href="#u8-library"> Unsigned 8-bit integer libraries</a></li>
       <li><a href="#s8-library"> Signed 8-bit integer libraries</a></li>
       <li><a href="#arbitrary-precision-library"> Arbitrary precision library</a></li>
@@ -219,7 +214,7 @@ Library summaries</a></li>
     do not use procedures for similar values, such as implementation
     limits.
     </li>
-<li>Should this also include the serialization of number vectors? Or
+<li class="strikethrough">Should this also include the serialization of number vectors? Or
     should that be treated somewhere else?
 </li>
 <li>Needs more examples (they can be adapted from the
@@ -412,7 +407,6 @@ Library summaries</a></li>
 <p>
   The libraries <a href="#composite-library"><code>(srfi 281)</code></a>,
   <a href="#base-library"><code>(srfi 281 base)</code></a>,
-  <a href="#serialization-library"><code>(srfi 281 serialization)</code></a>,
   and
   <a href="#u8-library"><code>(srfi 281 u8)</code></a> must be supported.
 </p>
@@ -574,174 +568,6 @@ this form is expanded.
   <span class="boxed-tag">Note</span>:
 Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p></div>
-
-<h3 id="serialization-library"><a href="#serialization-library"></a> Serialization library</h3>
-
-<p>
-  These procedures are adapted from
-  <a href="https://srfi.schemers.org/srfi-207/">SRFI 207</a>
-  on account of their general applicability to bytevectors.
-  They now take <var>start</var> and <var>end</var>
-  arguments. However, the requirement that the procedures must ignore
-  spaces in their input has been removed for efficiency reasons.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="deserialization-errorp" href="#deserialization-errorp"
-                        >deserialization-error?</a> <var>obj</var>)</code>
-</div>
-
-
-<p>
-  When a deserialization procedure encounters an error, it signals an
-  error that satisfies this predicate.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="deserialization-error-string" href="#deserialization-error-string"
-                        >deserialization-error-string</a> <var>e</var>)</code>
-</div>
-
-<p>
-  It is an error if <var>e</var> does not satisfy
-  <a href="#deserialization-errorp"><code>deserialization-error?</code></a>.
-</p>
-
-<p>
-  Returns the string that was being deserialized.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="deserialization-error-start" href="#deserialization-error-start"
-                        >deserialization-error-start</a> <var>e</var>)</code><br>
-<code class="signature">(<a id="deserialization-error-end" href="#deserialization-error-end"
-                        >deserialization-error-end</a> <var>e</var>)</code><br>
-</div>
-
-<p>
-  It is an error if <var>e</var> does not satisfy
-  <a href="#deserialization-errorp"><code>deserialization-error?</code></a>.
-</p>
-
-<p>
-  Return the index in the string that is the start/end of the offending
-  span of characters.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="deserialization-error-message" href="#deserialization-error-message"
-                        >deserialization-error-message</a> <var>e</var>)</code><br>
-</div>
-<p>
-  It is an error if <var>e</var> does not satisfy
-  <a href="#deserialization-errorp"><code>deserialization-error?</code></a>.
-</p>
-
-<p>
-  Return an error message about the deserialization error.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="bytevector-to-hex-string" href="#bytevector-to-hex-string">bytevector-&gt;hex-string</a>
-                         <var>bytevector</var>
-                         [<var>start</var> [<var>end</var>]])</code>
-</div>
-
-<p>
-  Returns a newly allocated string consisting of the
-  bytes of <var>bytevector</var> between <var>start</var> and <var>end</var>
-  as upper-case ASCII hexadecimal digits.
-</p>
-
-<pre
-><code class="example-code">(bytevector->hex-string #u8(#xFE #xFF))</code
-> ⇒ <code>"FEFF"</code></pre>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="hex-string-to-bytevector" href="#hex-string-to-bytevector">hex-string-&gt;bytevector</a>
-                         <var>string</var>
-                         [<var>start</var> [<var>end</var>]])</code>
-</div>
-
-<p>
-  Returns a newly allocated bytevector, where each sequential pair of hexadecimal
-  digits in <var>string</var> between <var>start</var> and <var>end</var> is
-  converted into the corresponding byte.
-</p>
-
-<p>
-  If <var>string</var> between <var>start</var> and <var>end</var>
-  is not made up of pairs of hex digits, an error satisfying <a
-  href="#deserialization-errorp"><code>deserializtion-error?</code></a>
-  is raised with the invalid part of the string as the start and end.
-</p>
-
-<pre
-><code class="example-code">(hex-string->bytevector "abcdef")</code
-> ⇒ <code>#u8(#xAB #xCD #xEF)</code></pre>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="bytevector-to-base64" href="#bytevector-to-base64">bytevector-&gt;base64</a>
-                         <var>bytevector</var>
-                         [<var>digits</var> [<var>start</var> [<var>end</var>]]])</code>
-</div>
-
-<p>
-  It is an error if <var>digits</var> is not a string of two characters
-  or <code>#f</code>. It is an error if the string contains ASCII alphanumeric
-  characters or the character <code>=</code>.
-  If <var>digits</var> is not supplied or <code>#f</code>,
-  it defaults to <code>"+/"</code>.
-</p>
-
-<p>
-  Converts the bytes of <var>bytevector</var> between <var>start</var> and <var>end</var>
-  into a base64 encoded string. The numbers 62 and 63 are encoded as the first and
-  second character, respectively, in <var>digits</var>.
-</p>
-
-<p>This description defers to RFC 4648.</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="base64-to-bytevector" href="#base64-to-bytevector">base64-&gt;bytevector</a>
-                         <var>string</var>
-                         [<var>digits</var> [<var>start</var> [<var>end</var>]]])</code>
-</div>
-
-<p>
-  It is an error if <var>digits</var> is not a string of two characters
-  or <code>#f</code>. It is an error if <var>digits</var> contains an ASCII alphanumeric
-  character or the character <code>=</code>.
-  If <var>digits</var> is not supplied or <code>#f</code>,
-  it defaults to <code>"+/"</code>.
-</p>
-
-<p>
-  Decodes the base64-encoded <var>string</var> between <var>start</var>
-  and <var>end</var> into a bytevector. The first and second characters in
-  <var>digits</var> are decoded into the numbers 62 and 63, respectively.
-</p>
-
-<p>This description defers to RFC 4648.</p>
-
-<p>
-  If <var>string</var> in between the two indices is
-  not a valid base64 string, an error satisfying <a
-  href="#deserialization-errorp"><code>deserializtion-error?</code></a>
-  is raised with the invalid part of the string as the start and end.
-</p>
-
-<pre
-><code class="example-code">(bytevector->base64 (string->utf8 "R7RS"))</code> ⇒ <code>&quot;UjdSUw==&quot;</code>
-<code  class="example-code">(base64->bytevector &quot;U2NoZW1l&quot;)</code> ⇒ <code>#u8(83 99 104 101 109 101)</code></pre>
 
 <h3 id="u8-library"><a href="#u8-library"></a> Unsigned 8-bit integer libraries</h3>
 
@@ -1376,7 +1202,7 @@ the procedure attempts to decode invalid
 </p>
 
 <div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
+<span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="unicode-decoding-error-message" href="#unicode-decoding-error-message"
                         >unicode-decoding-error-message</a> <var>e</var>)</code><br>
 </div>
@@ -1519,35 +1345,11 @@ BOM in the encoding is decoded as a regular character.
 
 <p>
   An object that satisfies
-  <a href="#deserialization-errorp"><code>deserialization-error?</code></a>
-  necessarily satisfies
-  <a href="#deserialization-conditionp"><code>deserialization-condition?</code></a>
-  and
-  <a href="#string-range-conditionp"><code>string-range-condition?</code></a>.
-  An object that satisfies
   <a href="#unicode-decoding-errorp"><code>unicode-decoding-error?</code></a>
   necessarily satisfies
   <a href="#unicode-decoding-conditionp"><code>unicode-decoding-condition?</code></a>
   and
   <a href="#bytevector-range-conditionp"><code>bytevector-range-condition?</code></a>.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 condition)</span><br>
-<span class="category">condition type</span>
-<code class="signature"><a id="deserialization-condition" href="#deserialization-condition">&amp;deserialization-condition</a></code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="deserialization-conditionp"
-                            href="#deserialization-conditionp"
-                        >deserialization-condition?</a> <var>obj</var>)</code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="make-deserialization-condition"
-                            href="#make-deserialization-condition"
-                        >make-deserialization-condition</a>)</code><br>
-</div>
-
-<p>
-  Condition object for conditions related to deserialization.
 </p>
 
 <div class="feature">
@@ -1568,32 +1370,6 @@ BOM in the encoding is decoded as a regular character.
 <p>
   Condition object for conditions related to Unicode decoding.
 </p>
-
-<div class="feature">
-<span class="category">(srfi 281 condition)</span><br>
-<span class="category">condition type</span>
-<code class="signature"><a id="string-range-condition"
-                           href="#string-range-condition">&amp;string-range-condition</a></code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="string-range-conditionp" href="#string-range-conditionp"
-                        >string-range-condition?</a> <var>obj</var>)</code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="make-string-range-condition"
-                           href="#make-string-range-condition">make-string-range-condition</a
-                           > <var>string</var> <var>start</var> <var>end</var>)</code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="string-range-condition-string"
-                           href="#string-range-condition-string">string-range-condition-string</a
-                           > <var>e</var>)</code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="string-range-condition-start"
-                           href="#string-range-condition-start">string-range-condition-start</a
-                           > <var>e</var>)</code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="string-range-condition-end"
-                           href="#string-range-condition-start">string-range-condition-end</a
-                           > <var>e</var>)</code><br>
-</div>
 
 <p>
   Condition relating to a range in a string.

@@ -123,23 +123,6 @@
                             bytevector-s64-native-ref
                             bytevector-s64-native-set!)
 
-(include "bytevector-to-hex-string.scm")
-(test-bytevector->hex-string)
-(include "hex-string-to-bytevector.scm")
-(test-hex-string->bytevector)
-
-(include "hex-string-to-bytevector-inversion.scm")
-(test-hex-string->bytevector-and-bytevector->hex-string-1)
-(test-hex-string->bytevector-and-bytevector->hex-string-2)
-
-(include "bytevector-to-base64.scm")
-(test-bytevector->base64)
-(include "base64-to-bytevector.scm")
-(test-base64->bytevector)
-(test-base64->bytevector-start-end)
-(include "bytevector-base64-inverse.scm")
-(test-bytevector->base64-and-base64->bytevector-inverses)
-
 (include "binary32.scm")
 (test-binary32)
 (test-binary32-native)
