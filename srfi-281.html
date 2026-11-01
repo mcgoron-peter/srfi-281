@@ -1284,21 +1284,21 @@ Only the name of ⟨<var>symbol</var>⟩ is significant.
 </p>
 
 <pre
-><code class="example-code">(utf8->string #u8(#xCE #xBB))</code> ⇒ "λ"
-<code class="example-code">(utf8->string #u8(#xCE #xBB #xFE #xCE #xB7))</code
+><code class="example-code">(utf8-&gt;string #u8(#xCE #xBB))</code> ⇒ "λ"
+<code class="example-code">(utf8-&gt;string #u8(#xCE #xBB #xFE #xCE #xB7))</code
 > ⇒ <span class="special-result">exception</span>
-<code class="example-code">(utf8->string #u8(#xCE #xBB #xFE #xCE #xB7) 3)</code
+<code class="example-code">(utf8-&gt;string #u8(#xCE #xBB #xFE #xCE #xB7) 3)</code
 > ⇒ "η"
 <code class="example-code"
->(utf8->string #u8(#xCE #xBB #xFE #xCE #xB7) 0 5
+>(utf8-&gt;string #u8(#xCE #xBB #xFE #xCE #xB7) 0 5
               (error-handling-mode replace))</code
 > ⇒ "λ\xFFFD;η"
 <code class="example-code">
-(utf8->string #u8(#xCE #xBB #xFE #xCE #xB7) 0 5
+(utf8-&gt;string #u8(#xCE #xBB #xFE #xCE #xB7) 0 5
              (error-handling-mode ignore))</code
 > ⇒ "λη"
 <code class="example-code">
-(utf8->string #u8(#xC0 80))</code
+(utf8-&gt;string #u8(#xC0 80))</code
 > ⇒ <span class="special-result">exception</span>
 </pre>
 
@@ -1340,46 +1340,46 @@ BOM in the encoding is decoded as a regular character.
 
 <pre
 ><code class="example-code"
->(utf16->string #u8(#xBB #x03)
+>(utf16-&gt;string #u8(#xBB #x03)
                (endianness little))</code> ⇒ "λ" ; U+3BB
 <code class="example-code"
->(utf16->string #u8(#xBB #x03)
+>(utf16-&gt;string #u8(#xBB #x03)
                (endianness big))</code> ⇒ "묃" ; U+BB03
 <code class="example-code"
->(utf16->string #u8(#xFF #xFE #xBB #x03)
+>(utf16-&gt;string #u8(#xFF #xFE #xBB #x03)
                (endianness little))</code
 >⇒ "λ"
 <code class="example-code"
->(utf16->string #u8(#xFF #xFE #xBB #x03)
+>(utf16-&gt;string #u8(#xFF #xFE #xBB #x03)
                (endianness big))</code
 >⇒ "λ"
 <code class="example-code"
->(utf16->string #u8(#xFF #xFE #xBB #x03)
+>(utf16-&gt;string #u8(#xFF #xFE #xBB #x03)
                (endianness little) #t)</code
 >⇒ "#\xFFFE;λ"
 <code class="example-code"
->(utf16->string #u8(#xFF #xFE #xBB #x03)
+>(utf16-&gt;string #u8(#xFF #xFE #xBB #x03)
                (endianness big) #t)</code
 >⇒ "#\xFEFF;묃"
 <code class="example-code"
->(utf16->string #u8(#xBB #x3 #xB1 #x3 #xBC
+>(utf16-&gt;string #u8(#xBB #x3 #xB1 #x3 #xBC
                   #x3 #xB4 #x3 #xB1 #x3)
                (endianness little) #f 0 6)</code
 >⇒ "λαμ"
 <code class="example-code"
->(utf16->string #u8(#xBB #x3 #xB1 #x3 #xBC
+>(utf16-&gt;string #u8(#xBB #x3 #xB1 #x3 #xBC
                   #x3 #xB4 #x3 #xB1 #x3)
                (endianness little) #f 0 5)</code
 >⇒ <span class="special-result">exception</span>
 <code class="example-code"
->(utf16->string #u8(#xBB #x3 #xB1 #x3 #xBC
+>(utf16-&gt;string #u8(#xBB #x3 #xB1 #x3 #xBC
                   #x3 #xB4 #x3 #xB1 #x3)
                (endianness little) #f 0 5
                (error-handling-mode replace))</code
 >⇒ "λα\xFFFD;"
 
 <code class="example-code"
->(utf16->string #u8(#xD8 #x80) (endianness big))</code
+>(utf16-&gt;string #u8(#xD8 #x80) (endianness big))</code
 > ⇒ <span class="special-result">exception</span></pre>
 
 <h4 id="encoding-procedures"><a href="#encoding-procedures"></a> Encoding procedures</h4>
