@@ -18,7 +18,8 @@
         (srfi 194)
         (rename (srfi 252)
                 (test-property %test-property))
-        (srfi 281))
+        (srfi 281)
+        (prefix (srfi 281 r6rs) r6rs:))
 
 (include "prelude.scm")
 (test-begin "SRFI 281")
@@ -177,5 +178,9 @@
 (test-r6rs-u16-examples)
 (test-r6rs-u32-examples)
 (test-r6rs-u64-examples)
+
+(include "r6rs.scm")
+(test-r6rs-utf8->string)
+(test-r6rs-bytevector-copy!)
 
 (test-end "SRFI 281")

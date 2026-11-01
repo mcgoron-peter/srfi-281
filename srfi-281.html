@@ -373,13 +373,15 @@ Library summaries</a></li>
   If this library is voted into <span class="report-name">R<sup>7</sup>RS Large</span>,
   then all features are supported,
   <code>(scheme bytevector)</code> must be the composite library,
-  and <code>(scheme bytevector)</code> not have any sublibraries.
+  and <code>(scheme bytevector r6rs)</code> is
+  <code>(srfi 281 r6rs)</code>.
 </p>
 
 <h3 id="composite-library"><a href="#composite-library"></a> Composite library</h3>
 
 <p>The library <code>(srfi 281)</code> exports all identifiers defined
-   below that are supported by the implementation. For example, if an
+   below that are supported by the implementation, with the exception of the
+   ones defined in <code>(srfi 281 r6rs)</code>. For example, if an
    implementation does not support
    <code><a href="#endianness">endianness</a></code>, then the base
    library does not export it.
@@ -1492,6 +1494,29 @@ BOM in the encoding is decoded as a regular character.
 </div>
 <p>
   Condition relating to a range in a bytevector.
+</p>
+
+<h3 id="r6rs-library"><a href="#r6rs-library"></a> <span class="report-name">R<sup>6</sup>RS</span> compatibility library</h3>
+
+<p>
+  The <code>(srfi 281 r6rs)</code> library should be supplied. It exports all identifiers
+  defined in the <code>(rnrs bytevectors)</code> library, as described in the
+  <span class="report-name">R<sup>6</sup>RS</span>. Each identifier exported from this
+  library is <em>compatible</em> with the <span class="report-name">R<sup>6</sup>RS</span>,
+  in the following way: if the use of some procedure or syntax does not raise an exception of
+  type <code>&amp;violation</code>, then the use behaves as described in the
+  <span class="report-name">R<sup>6</sup>RS</span>. This means that
+</p>
+
+<ul>
+  <li>The <code>bytevector-copy!</code> procedure has a different argument order, and
+      a different interpretation of the arguments.</li>
+  <li>The default mode for the Unicode decoders is <code>raise</code>.</li>
+</ul>
+
+<p>
+  Procedures exported from this library should implementations described in
+  this SRFI, to the extent that they do not conflict with compatibility.
 </p>
 
 <h2 id="implementation"><a href="#implementation"></a> Implementation</h2>

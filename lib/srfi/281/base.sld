@@ -12,7 +12,8 @@
           make-bytevector bytevector
           bytevector=?
           bytevector-fill!
-          bytevector? bytevector-length bytevector-copy)
+          bytevector? bytevector-length
+          bytevector-copy bytevector-copy!)
   (cond-expand
     (little-endian
      (begin (define (native-endianness) 'little)))

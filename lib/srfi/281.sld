@@ -8,7 +8,7 @@
           bytevector bytevector? make-bytevector bytevector-fill!
           bytevector-length
           bytevector=?
-          bytevector-copy
+          bytevector-copy bytevector-copy!
           bytevector-u8-ref bytevector-u8-set!
           u8-list->bytevector bytevector->u8-list)
   (cond-expand
