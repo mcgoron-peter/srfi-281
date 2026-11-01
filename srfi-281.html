@@ -97,6 +97,11 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
               min-width: 46ch;
             }
 
+            .special-result {
+              font-family: sans-serif;
+              font-style: italic;
+            }
+
             a {
               color: var(--link-color);
             }
@@ -591,6 +596,8 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   Copies the bytes of <var>list</var> from <var>start</var> to <var>end</var>
   to a newly allocated bytevector.
 </p>
+<pre><code class="example-code"
+>(bytevector->u8-list #u8(1 2 3 #xFE #xFF 4 5 6) 3 5)</code> ⇒ <code>(#xFE #xFF)</code></pre>
 
 <div class="feature">
 <span class="category">(srfi 281 u8)<br>procedure</span>
@@ -603,6 +610,8 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   Copies the bytes of <var>bytevector</var> from <var>start</var> to <var>end</var>
   to a newly allocated list.
 </p>
+<pre><code class="example-code"
+>(u8-list->bytevector '(1 2 3 #xFE #xFF . 4) 3 5)</code> ⇒ <code>#u8(#xFE #xFF)</code></pre>
 
 <h3 id="s8-library"><a href="#s8-library"></a> Signed 8-bit integer libraries</h3>
 
@@ -798,6 +807,34 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   <var>size</var>.
 </p>
 
+<h4 id="int-example"><a href="#int-example"></a> Examples</h4>
+<pre
+>(define b (make-bytevector 16 -127))
+(bytevector-uint-set! b 0 (- (expt 2 128) 3) (endianness little) 16)
+<code class="example-code"
+>(bytevector-uint-ref b 0 (endianness little) 16)</code> ⇒ #xfffffffffffffffffffffffffffffffd
+<code class="example-code"
+>(bytevector-sint-ref b 0 (endianness little) 16)</code> ⇒ -3
+<code class="example-code">(bytevector->u8-list b)</code
+> ⇒ (253 255 255 255
+<code class="example-code"></code>     255 255 255 255
+<code class="example-code"></code>     255 255 255 255
+<code class="example-code"></code>     255 255 255 255)
+(bytevector-uint-set! b 0 (- (expt 2 128) 3) (endianness big) 16)
+<code class="example-code"
+>(bytevector-uint-ref b 0 (endianness big) 16)</code
+> ⇒ #xfffffffffffffffffffffffffffffffd
+<code class="example-code"
+>(bytevector-sint-ref b 0 (endianness big) 16)</code
+>⇒ -3
+<code class="example-code"
+>(bytevector->u8-list b)</code
+>⇒ (255 255 255 255
+<code class="example-code"></code>    255 255 255 255
+<code class="example-code"></code>    255 255 255 255
+<code class="example-code"></code>    255 255 255 253)
+</pre>
+
 <h3 id="multibyte-libraries"><a href="#multibyte-libraries"></a> Multibyte libraries</h3>
 
 <p>
@@ -892,6 +929,57 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   Store the ⟨w⟩-byte number <var>n</var> into <var>bytevector</var> starting at
   <var>k</var>, with the native endianness.
 </p>
+
+<h4 id="fixed-example"><a href="#fixed-example"></a> Examples</h4>
+
+<pre
+>(define b
+  (u8-list->bytevector
+  '(255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 253)))
+
+<code class="example-code">(bytevector-u16-ref b 14 (endianness little))</code
+>⇒ 65023
+<code class="example-code">(bytevector-s16-ref b 14 (endianness little))</code
+>⇒ -513
+<code class="example-code">(bytevector-u16-ref b 14 (endianness big))</code
+>⇒ 65533
+<code class="example-code">(bytevector-s16-ref b 14 (endianness big))</code
+>⇒ -3
+
+(bytevector-u16-set! b 0 12345 (endianness little))
+<code class="example-code">(bytevector-u16-ref b 0 (endianness little))</code
+>⇒ 12345
+
+(bytevector-u16-native-set! b 0 12345)
+<code class="example-code">(bytevector-u16-native-ref b 0)</code
+>⇒ 12345
+<code class="example-code">(bytevector-u16-ref b 0 (endianness little))</code
+>⇒ <span class="special-result">unspecified</span></pre>
+
+<pre
+>(define b
+  (u8-list->bytevector
+  '(255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 253)))
+
+<code class="example-code">(bytevector-u32-ref b 12 (endianness little))</code
+> ⇒ 4261412863
+<code class="example-code">(bytevector-s32-ref b 12 (endianness little))</code
+>⇒ -33554433
+<code class="example-code">(bytevector-u32-ref b 12 (endianness big))</code
+>⇒ 4294967293
+<code class="example-code">(bytevector-s32-ref b 12 (endianness big))</code
+>⇒ -3
+
+<code class="example-code">(bytevector-u64-ref b 8 (endianness little))</code
+>⇒ 18302628885633695743
+<code class="example-code">(bytevector-s64-ref b 8 (endianness little))</code
+>⇒ -144115188075855873
+<code class="example-code">(bytevector-u64-ref b 8 (endianness big))</code
+>⇒ 18446744073709551613
+<code class="example-code">(bytevector-s64-ref b 8 (endianness big))</code
+>⇒ -3</pre>
 
 <h3 id="floating-point-libraries"><a href="#floating-point-libraries"></a> Floating-point libraries</h3>
 
@@ -1256,6 +1344,25 @@ Only the name of ⟨<var>symbol</var>⟩ is significant.
   <var>error-handling-mode</var>.
 </p>
 
+<pre
+><code class="example-code">(utf8->string #u8(#xCE #xBB))</code> ⇒ "λ"
+<code class="example-code">(utf8->string #u8(#xCE #xBB #xFE #xCE #xB7))</code
+> ⇒ <span class="special-result">exception</span>
+<code class="example-code">(utf8->string #u8(#xCE #xBB #xFE #xCE #xB7) 3)</code
+> ⇒ "η"
+<code class="example-code"
+>(utf8->string #u8(#xCE #xBB #xFE #xCE #xB7) 0 5
+              (error-handling-mode replace))</code
+> ⇒ "λ\xFFFD;η"
+<code class="example-code">
+(utf8->string #u8(#xCE #xBB #xFE #xCE #xB7) 0 5
+             (error-handling-mode ignore))</code
+> ⇒ "λη"
+<code class="example-code">
+(utf8->string #u8(#xC0 80))</code
+> ⇒ <span class="special-result">exception</span>
+</pre>
+
 <div class="feature">
 <span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="utf16-to-string" href="#utf16-to-string">utf16-&gt;string</a>
@@ -1291,6 +1398,50 @@ present, <var>endianness</var> specifies the endianness of the encoding. If
 specifies the endianness of the encoding, and any
 BOM in the encoding is decoded as a regular character.
 </p>
+
+<pre
+><code class="example-code"
+>(utf16->string #u8(#xBB #x03)
+               (endianness little))</code> ⇒ "λ" ; U+3BB
+<code class="example-code"
+>(utf16->string #u8(#xBB #x03)
+               (endianness big))</code> ⇒ "묃" ; U+BB03
+<code class="example-code"
+>(utf16->string #u8(#xFF #xFE #xBB #x03)
+               (endianness little))</code
+>⇒ "λ"
+<code class="example-code"
+>(utf16->string #u8(#xFF #xFE #xBB #x03)
+               (endianness big))</code
+>⇒ "λ"
+<code class="example-code"
+>(utf16->string #u8(#xFF #xFE #xBB #x03)
+               (endianness little) #t)</code
+>⇒ "#\xFFFE;λ"
+<code class="example-code"
+>(utf16->string #u8(#xFF #xFE #xBB #x03)
+               (endianness big) #t)</code
+>⇒ "#\xFEFF;묃"
+<code class="example-code"
+>(utf16->string #u8(#xBB #x3 #xB1 #x3 #xBC
+                  #x3 #xB4 #x3 #xB1 #x3)
+               (endianness little) #f 0 6)</code
+>⇒ "λαμ"
+<code class="example-code"
+>(utf16->string #u8(#xBB #x3 #xB1 #x3 #xBC
+                  #x3 #xB4 #x3 #xB1 #x3)
+               (endianness little) #f 0 5)</code
+>⇒ <span class="special-result">exception</span>
+<code class="example-code"
+>(utf16->string #u8(#xBB #x3 #xB1 #x3 #xBC
+                  #x3 #xB4 #x3 #xB1 #x3)
+               (endianness little) #f 0 5
+               (error-handling-mode replace))</code
+>⇒ "λα\xFFFD;"
+
+<code class="example-code"
+>(utf16->string #u8(#xD8 #x80) (endianness big))</code
+> ⇒ <span class="special-result">exception</span></pre>
 
 <h4 id="encoding-procedures"><a href="#encoding-procedures"></a> Encoding procedures</h4>
 <div class="feature">
