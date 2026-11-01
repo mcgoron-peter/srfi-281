@@ -162,7 +162,6 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
 <h2 id="toc">Table of contents</h2>
 <ul>
   <li><a href="#abstract"> Abstract</a></li>
-  <li><a href="#issues"> Issues</a></li>
   <li>
     <a href="#rationale"> Rationale</a>
     <ul>
@@ -205,66 +204,6 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
 Library summaries</a></li>
   <li><a href="#copyright"> Copyright</a></li>
 </ul>
-
-<h2 id="issues"><a href="#issues"></a> Issues</h2>
-
-<ol>
-<li class="strikethrough">Should <code><a href="#native-endianness">native-endianness</a></code>
-    be a procedure or a value?
-    The <span class="report-name">R<sup>7</sup>RS</span> Large usually
-    does not have procedures like this: the
-    <a href="https://srfi.schemers.org/srfi-144/">flonum library</a>
-    and the
-    <a href="https://srfi.schemers.org/srfi-143/">fixnum library</a>
-    do not use procedures for similar values, such as implementation
-    limits.
-    </li>
-<li class="strikethrough">Should this also include the serialization of number vectors? Or
-    should that be treated somewhere else?
-</li>
-<li>Needs more examples (they can be adapted from the
-<span class="report-name">R<sup>6</sup>RS</span>).</li>
-<li class="strikethrough">The sample implementation is mostly complete, but is missing a few
-    corner cases, particularly in the serialization library.</li>
-<li><div class="strikethrough">I want this SRFI to contain an API comparable to
-    <a href="https://srfi.schemers.org/srfi-207/">SRFI 207</a>
-    and <a href="https://srfi.schemers.org/srfi-152/">SRFI 152</a>
-    adapted to strings and without reference to ASCII characters.
-    However, some of the procedure signatures in SRFI 207 differ
-    from SRFI 152. In addition, there are procedures on
-    u8vectors in
-    <a href="https://srfi.schemers.org/srfi-160/">SRFI 160</a>
-    that are different from procedures in either SRFI:
-    <ul>
-    <li><code>bytestring-pad</code>: can take a char argument,
-        <code>string-pad</code> can take start and end arguments.
-        The returned value of <code>string-pad</code> is exactly
-        len, while <code>bytestring-pad</code> is at least len.
-    </li>
-    <li><code>bytestring-index</code>: does not take start and
-        end arguments. The similar <code>u8vector-index</code>
-        takes one or more u8vectors.
-    </li>
-    <li><code>bytestring-trim</code>: does not take start and
-        end arguments like <code>string-trim</code>.
-    </li>
-    <li><code>bytestring-span</code> and <code>bytestring-break</code>:
-        do not take start and end arguments.
-    </li>
-    <li><code>bytestring-split</code> does not take start and
-         end argument.
-    </li>
-    </ul>
-    </div>
-    <p>
-      Bytestring style procedures have been removed, and will be
-      proposed in a different SRFI.
-    </p>
-</li>
-<li>This needs to be tested on other implementations, such as TR7, Gambit,
-    CHICKEN 6, Sagittarius, and Capy, for their various other features.
-</li>
-</ol>
 
 <h2 id="rationale"><a href="#rationale"></a> Rationale</h2>
 <p><em>This section is non-normative.</em></p>
