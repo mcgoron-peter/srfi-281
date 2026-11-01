@@ -83,6 +83,6 @@
                   (bytevector-u64-ref b 8 (endianness little)))
       (test-equal -144115188075855873
                   (bytevector-s64-ref b 8 (endianness little)))
-      (test-equal 18446744073709551613 
+      (test-equal 18446744073709551613
                   (bytevector-u64-ref b 8 (endianness big)))
       (test-equal -3 (bytevector-s64-ref b 8 (endianness big))))))
