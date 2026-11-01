@@ -11,7 +11,7 @@
     ((library (rnrs bytevectors))
      (import (rnrs bytevectors)))
     (else
-     (import (scheme base) (only (srfi 281 base) endianness?))
+     (import (scheme base) (only (srfi 281 base) endianness? native-endianness))
      (include-library-declarations "internal.scm")
      (include-library-declarations "internal-fixed.scm")
      (begin

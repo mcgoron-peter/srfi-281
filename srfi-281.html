@@ -97,6 +97,11 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
               min-width: 46ch;
             }
 
+            .special-result {
+              font-family: sans-serif;
+              font-style: italic;
+            }
+
             a {
               color: var(--link-color);
             }
@@ -151,17 +156,12 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
   This SRFI implements a modified version of the <span
   class="report-name">R<sup>6</sup>RS</span>’s <code>(rnrs bytevectors
   (6))</code> library, which has procedures for the serialization and deserialization
-  of numbers into bytevectors, and conversion to/from Unicode. It also
-  includes some procedures from
-  <a href="https://srfi.schemers.org/srfi-207/">SRFI 207</a>
-  that are relevant to all bytevectors, such as serialization/deserialization
-  into strings, and order predicates.
+  of numbers into bytevectors, and conversion to/from Unicode.
 </p>
 
 <h2 id="toc">Table of contents</h2>
 <ul>
   <li><a href="#abstract"> Abstract</a></li>
-  <li><a href="#issues"> Issues</a></li>
   <li>
     <a href="#rationale"> Rationale</a>
     <ul>
@@ -176,7 +176,6 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
       <li><a href="#composite-library"> Composite library</a></li>
       <li><a href="#base-library"> Base library</a></li>
       <li><a href="#endianness-library"> Endianness library</a></li>
-      <li><a href="#serialization-library"> Serialization library</a></li>
       <li><a href="#u8-library"> Unsigned 8-bit integer libraries</a></li>
       <li><a href="#s8-library"> Signed 8-bit integer libraries</a></li>
       <li><a href="#arbitrary-precision-library"> Arbitrary precision library</a></li>
@@ -205,66 +204,6 @@ SPDX-License-Identifier: MIT AND LicenseRef-R6RS
 Library summaries</a></li>
   <li><a href="#copyright"> Copyright</a></li>
 </ul>
-
-<h2 id="issues"><a href="#issues"></a> Issues</h2>
-
-<ol>
-<li class="strikethrough">Should <code><a href="#native-endianness">native-endianness</a></code>
-    be a procedure or a value?
-    The <span class="report-name">R<sup>7</sup>RS</span> Large usually
-    does not have procedures like this: the
-    <a href="https://srfi.schemers.org/srfi-144/">flonum library</a>
-    and the
-    <a href="https://srfi.schemers.org/srfi-143/">fixnum library</a>
-    do not use procedures for similar values, such as implementation
-    limits.
-    </li>
-<li>Should this also include the serialization of number vectors? Or
-    should that be treated somewhere else?
-</li>
-<li>Needs more examples (they can be adapted from the
-<span class="report-name">R<sup>6</sup>RS</span>).</li>
-<li class="strikethrough">The sample implementation is mostly complete, but is missing a few
-    corner cases, particularly in the serialization library.</li>
-<li><div class="strikethrough">I want this SRFI to contain an API comparable to
-    <a href="https://srfi.schemers.org/srfi-207/">SRFI 207</a>
-    and <a href="https://srfi.schemers.org/srfi-152/">SRFI 152</a>
-    adapted to strings and without reference to ASCII characters.
-    However, some of the procedure signatures in SRFI 207 differ
-    from SRFI 152. In addition, there are procedures on
-    u8vectors in
-    <a href="https://srfi.schemers.org/srfi-160/">SRFI 160</a>
-    that are different from procedures in either SRFI:
-    <ul>
-    <li><code>bytestring-pad</code>: can take a char argument,
-        <code>string-pad</code> can take start and end arguments.
-        The returned value of <code>string-pad</code> is exactly
-        len, while <code>bytestring-pad</code> is at least len.
-    </li>
-    <li><code>bytestring-index</code>: does not take start and
-        end arguments. The similar <code>u8vector-index</code>
-        takes one or more u8vectors.
-    </li>
-    <li><code>bytestring-trim</code>: does not take start and
-        end arguments like <code>string-trim</code>.
-    </li>
-    <li><code>bytestring-span</code> and <code>bytestring-break</code>:
-        do not take start and end arguments.
-    </li>
-    <li><code>bytestring-split</code> does not take start and
-         end argument.
-    </li>
-    </ul>
-    </div>
-    <p>
-      Bytestring style procedures have been removed, and will be
-      proposed in a different SRFI.
-    </p>
-</li>
-<li>This needs to be tested on other implementations, such as TR7, Gambit,
-    CHICKEN 6, Sagittarius, and Capy, for their various other features.
-</li>
-</ol>
 
 <h2 id="rationale"><a href="#rationale"></a> Rationale</h2>
 <p><em>This section is non-normative.</em></p>
@@ -296,10 +235,9 @@ Library summaries</a></li>
 </p>
 
 <ol>
-<li>The <code>bytevector-copy!</code> procedure is not defined in this SRFI.</li>
-<li>The <code>bytevector-copy</code> procedure is specified to be the
-    same one as the <span class="report-name">R<sup>7</sup>RS</span>
-    procedure.</li>
+<li>The <code>bytevector-copy</code> and <code>bytevector-copy!</code>
+    procedure is specified to be the same one as the <span
+    class="report-name">R<sup>7</sup>RS</span> procedure.</li>
 <li>The Unicode encoding/decoding procedures and procedures that convert
     to and from lists are extended to take
     <var>start</var> and <var>end</var> arguments in a similar way to the
@@ -307,6 +245,8 @@ Library summaries</a></li>
 <li>The Unicode decoding procedures are required to raise exceptions when
     invalid data is encountered. An extra argument can control what the
     decoder does.</li>
+<li>The <span class="report-name">R<sup>6</sup>RS</span> versions are
+    exported by a compatibility library <code>(srfi 281 r6rs)</code>.</li>
 </ol>
 
 <p>
@@ -365,7 +305,7 @@ Library summaries</a></li>
 
 <p>
   If one specifically wants the <span class="report-name">R<sup>6</sup>RS</span>
-  procedures, one can import <code>(rnrs bytevectors)</code>.
+  procedures, one can import <code>(srfi 281 r6rs)</code>.
 </p>
 
 
@@ -412,7 +352,6 @@ Library summaries</a></li>
 <p>
   The libraries <a href="#composite-library"><code>(srfi 281)</code></a>,
   <a href="#base-library"><code>(srfi 281 base)</code></a>,
-  <a href="#serialization-library"><code>(srfi 281 serialization)</code></a>,
   and
   <a href="#u8-library"><code>(srfi 281 u8)</code></a> must be supported.
 </p>
@@ -435,13 +374,15 @@ Library summaries</a></li>
   If this library is voted into <span class="report-name">R<sup>7</sup>RS Large</span>,
   then all features are supported,
   <code>(scheme bytevector)</code> must be the composite library,
-  and <code>(scheme bytevector)</code> not have any sublibraries.
+  and <code>(scheme bytevector r6rs)</code> is
+  <code>(srfi 281 r6rs)</code>.
 </p>
 
 <h3 id="composite-library"><a href="#composite-library"></a> Composite library</h3>
 
 <p>The library <code>(srfi 281)</code> exports all identifiers defined
-   below that are supported by the implementation. For example, if an
+   below that are supported by the implementation, with the exception of the
+   ones defined in <code>(srfi 281 r6rs)</code>. For example, if an
    implementation does not support
    <code><a href="#endianness">endianness</a></code>, then the base
    library does not export it.
@@ -575,174 +516,6 @@ this form is expanded.
 Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 </p></div>
 
-<h3 id="serialization-library"><a href="#serialization-library"></a> Serialization library</h3>
-
-<p>
-  These procedures are adapted from
-  <a href="https://srfi.schemers.org/srfi-207/">SRFI 207</a>
-  on account of their general applicability to bytevectors.
-  They now take <var>start</var> and <var>end</var>
-  arguments. However, the requirement that the procedures must ignore
-  spaces in their input has been removed for efficiency reasons.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="deserialization-errorp" href="#deserialization-errorp"
-                        >deserialization-error?</a> <var>obj</var>)</code>
-</div>
-
-
-<p>
-  When a deserialization procedure encounters an error, it signals an
-  error that satisfies this predicate.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="deserialization-error-string" href="#deserialization-error-string"
-                        >deserialization-error-string</a> <var>e</var>)</code>
-</div>
-
-<p>
-  It is an error if <var>e</var> does not satisfy
-  <a href="#deserialization-errorp"><code>deserialization-error?</code></a>.
-</p>
-
-<p>
-  Returns the string that was being deserialized.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="deserialization-error-start" href="#deserialization-error-start"
-                        >deserialization-error-start</a> <var>e</var>)</code><br>
-<code class="signature">(<a id="deserialization-error-end" href="#deserialization-error-end"
-                        >deserialization-error-end</a> <var>e</var>)</code><br>
-</div>
-
-<p>
-  It is an error if <var>e</var> does not satisfy
-  <a href="#deserialization-errorp"><code>deserialization-error?</code></a>.
-</p>
-
-<p>
-  Return the index in the string that is the start/end of the offending
-  span of characters.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="deserialization-error-message" href="#deserialization-error-message"
-                        >deserialization-error-message</a> <var>e</var>)</code><br>
-</div>
-<p>
-  It is an error if <var>e</var> does not satisfy
-  <a href="#deserialization-errorp"><code>deserialization-error?</code></a>.
-</p>
-
-<p>
-  Return an error message about the deserialization error.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="bytevector-to-hex-string" href="#bytevector-to-hex-string">bytevector-&gt;hex-string</a>
-                         <var>bytevector</var>
-                         [<var>start</var> [<var>end</var>]])</code>
-</div>
-
-<p>
-  Returns a newly allocated string consisting of the
-  bytes of <var>bytevector</var> between <var>start</var> and <var>end</var>
-  as upper-case ASCII hexadecimal digits.
-</p>
-
-<pre
-><code class="example-code">(bytevector->hex-string #u8(#xFE #xFF))</code
-> ⇒ <code>"FEFF"</code></pre>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="hex-string-to-bytevector" href="#hex-string-to-bytevector">hex-string-&gt;bytevector</a>
-                         <var>string</var>
-                         [<var>start</var> [<var>end</var>]])</code>
-</div>
-
-<p>
-  Returns a newly allocated bytevector, where each sequential pair of hexadecimal
-  digits in <var>string</var> between <var>start</var> and <var>end</var> is
-  converted into the corresponding byte.
-</p>
-
-<p>
-  If <var>string</var> between <var>start</var> and <var>end</var>
-  is not made up of pairs of hex digits, an error satisfying <a
-  href="#deserialization-errorp"><code>deserializtion-error?</code></a>
-  is raised with the invalid part of the string as the start and end.
-</p>
-
-<pre
-><code class="example-code">(hex-string->bytevector "abcdef")</code
-> ⇒ <code>#u8(#xAB #xCD #xEF)</code></pre>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="bytevector-to-base64" href="#bytevector-to-base64">bytevector-&gt;base64</a>
-                         <var>bytevector</var>
-                         [<var>digits</var> [<var>start</var> [<var>end</var>]]])</code>
-</div>
-
-<p>
-  It is an error if <var>digits</var> is not a string of two characters
-  or <code>#f</code>. It is an error if the string contains ASCII alphanumeric
-  characters or the character <code>=</code>.
-  If <var>digits</var> is not supplied or <code>#f</code>,
-  it defaults to <code>"+/"</code>.
-</p>
-
-<p>
-  Converts the bytes of <var>bytevector</var> between <var>start</var> and <var>end</var>
-  into a base64 encoded string. The numbers 62 and 63 are encoded as the first and
-  second character, respectively, in <var>digits</var>.
-</p>
-
-<p>This description defers to RFC 4648.</p>
-
-<div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
-<code class="signature">(<a id="base64-to-bytevector" href="#base64-to-bytevector">base64-&gt;bytevector</a>
-                         <var>string</var>
-                         [<var>digits</var> [<var>start</var> [<var>end</var>]]])</code>
-</div>
-
-<p>
-  It is an error if <var>digits</var> is not a string of two characters
-  or <code>#f</code>. It is an error if <var>digits</var> contains an ASCII alphanumeric
-  character or the character <code>=</code>.
-  If <var>digits</var> is not supplied or <code>#f</code>,
-  it defaults to <code>"+/"</code>.
-</p>
-
-<p>
-  Decodes the base64-encoded <var>string</var> between <var>start</var>
-  and <var>end</var> into a bytevector. The first and second characters in
-  <var>digits</var> are decoded into the numbers 62 and 63, respectively.
-</p>
-
-<p>This description defers to RFC 4648.</p>
-
-<p>
-  If <var>string</var> in between the two indices is
-  not a valid base64 string, an error satisfying <a
-  href="#deserialization-errorp"><code>deserializtion-error?</code></a>
-  is raised with the invalid part of the string as the start and end.
-</p>
-
-<pre
-><code class="example-code">(bytevector->base64 (string->utf8 "R7RS"))</code> ⇒ <code>&quot;UjdSUw==&quot;</code>
-<code  class="example-code">(base64->bytevector &quot;U2NoZW1l&quot;)</code> ⇒ <code>#u8(83 99 104 101 109 101)</code></pre>
-
 <h3 id="u8-library"><a href="#u8-library"></a> Unsigned 8-bit integer libraries</h3>
 
 <p>
@@ -765,6 +538,8 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   Copies the bytes of <var>list</var> from <var>start</var> to <var>end</var>
   to a newly allocated bytevector.
 </p>
+<pre><code class="example-code"
+>(bytevector->u8-list #u8(1 2 3 #xFE #xFF 4 5 6) 3 5)</code> ⇒ <code>(#xFE #xFF)</code></pre>
 
 <div class="feature">
 <span class="category">(srfi 281 u8)<br>procedure</span>
@@ -777,6 +552,8 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   Copies the bytes of <var>bytevector</var> from <var>start</var> to <var>end</var>
   to a newly allocated list.
 </p>
+<pre><code class="example-code"
+>(u8-list->bytevector '(1 2 3 #xFE #xFF . 4) 3 5)</code> ⇒ <code>#u8(#xFE #xFF)</code></pre>
 
 <h3 id="s8-library"><a href="#s8-library"></a> Signed 8-bit integer libraries</h3>
 
@@ -972,6 +749,34 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   <var>size</var>.
 </p>
 
+<h4 id="int-example"><a href="#int-example"></a> Examples</h4>
+<pre
+>(define b (make-bytevector 16 -127))
+(bytevector-uint-set! b 0 (- (expt 2 128) 3) (endianness little) 16)
+<code class="example-code"
+>(bytevector-uint-ref b 0 (endianness little) 16)</code> ⇒ #xfffffffffffffffffffffffffffffffd
+<code class="example-code"
+>(bytevector-sint-ref b 0 (endianness little) 16)</code> ⇒ -3
+<code class="example-code">(bytevector->u8-list b)</code
+> ⇒ (253 255 255 255
+<code class="example-code"></code>     255 255 255 255
+<code class="example-code"></code>     255 255 255 255
+<code class="example-code"></code>     255 255 255 255)
+(bytevector-uint-set! b 0 (- (expt 2 128) 3) (endianness big) 16)
+<code class="example-code"
+>(bytevector-uint-ref b 0 (endianness big) 16)</code
+> ⇒ #xfffffffffffffffffffffffffffffffd
+<code class="example-code"
+>(bytevector-sint-ref b 0 (endianness big) 16)</code
+>⇒ -3
+<code class="example-code"
+>(bytevector->u8-list b)</code
+>⇒ (255 255 255 255
+<code class="example-code"></code>    255 255 255 255
+<code class="example-code"></code>    255 255 255 255
+<code class="example-code"></code>    255 255 255 253)
+</pre>
+
 <h3 id="multibyte-libraries"><a href="#multibyte-libraries"></a> Multibyte libraries</h3>
 
 <p>
@@ -1066,6 +871,57 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
   Store the ⟨w⟩-byte number <var>n</var> into <var>bytevector</var> starting at
   <var>k</var>, with the native endianness.
 </p>
+
+<h4 id="fixed-example"><a href="#fixed-example"></a> Examples</h4>
+
+<pre
+>(define b
+  (u8-list->bytevector
+  '(255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 253)))
+
+<code class="example-code">(bytevector-u16-ref b 14 (endianness little))</code
+>⇒ 65023
+<code class="example-code">(bytevector-s16-ref b 14 (endianness little))</code
+>⇒ -513
+<code class="example-code">(bytevector-u16-ref b 14 (endianness big))</code
+>⇒ 65533
+<code class="example-code">(bytevector-s16-ref b 14 (endianness big))</code
+>⇒ -3
+
+(bytevector-u16-set! b 0 12345 (endianness little))
+<code class="example-code">(bytevector-u16-ref b 0 (endianness little))</code
+>⇒ 12345
+
+(bytevector-u16-native-set! b 0 12345)
+<code class="example-code">(bytevector-u16-native-ref b 0)</code
+>⇒ 12345
+<code class="example-code">(bytevector-u16-ref b 0 (endianness little))</code
+>⇒ <span class="special-result">unspecified</span></pre>
+
+<pre
+>(define b
+  (u8-list->bytevector
+  '(255 255 255 255 255 255 255 255
+    255 255 255 255 255 255 255 253)))
+
+<code class="example-code">(bytevector-u32-ref b 12 (endianness little))</code
+> ⇒ 4261412863
+<code class="example-code">(bytevector-s32-ref b 12 (endianness little))</code
+>⇒ -33554433
+<code class="example-code">(bytevector-u32-ref b 12 (endianness big))</code
+>⇒ 4294967293
+<code class="example-code">(bytevector-s32-ref b 12 (endianness big))</code
+>⇒ -3
+
+<code class="example-code">(bytevector-u64-ref b 8 (endianness little))</code
+>⇒ 18302628885633695743
+<code class="example-code">(bytevector-s64-ref b 8 (endianness little))</code
+>⇒ -144115188075855873
+<code class="example-code">(bytevector-u64-ref b 8 (endianness big))</code
+>⇒ 18446744073709551613
+<code class="example-code">(bytevector-s64-ref b 8 (endianness big))</code
+>⇒ -3</pre>
 
 <h3 id="floating-point-libraries"><a href="#floating-point-libraries"></a> Floating-point libraries</h3>
 
@@ -1376,7 +1232,7 @@ the procedure attempts to decode invalid
 </p>
 
 <div class="feature">
-<span class="category">(srfi 281 serialization)<br>procedure</span>
+<span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="unicode-decoding-error-message" href="#unicode-decoding-error-message"
                         >unicode-decoding-error-message</a> <var>e</var>)</code><br>
 </div>
@@ -1430,6 +1286,25 @@ Only the name of ⟨<var>symbol</var>⟩ is significant.
   <var>error-handling-mode</var>.
 </p>
 
+<pre
+><code class="example-code">(utf8-&gt;string #u8(#xCE #xBB))</code> ⇒ "λ"
+<code class="example-code">(utf8-&gt;string #u8(#xCE #xBB #xFE #xCE #xB7))</code
+> ⇒ <span class="special-result">exception</span>
+<code class="example-code">(utf8-&gt;string #u8(#xCE #xBB #xFE #xCE #xB7) 3)</code
+> ⇒ "η"
+<code class="example-code"
+>(utf8-&gt;string #u8(#xCE #xBB #xFE #xCE #xB7) 0 5
+              (error-handling-mode replace))</code
+> ⇒ "λ\xFFFD;η"
+<code class="example-code">
+(utf8-&gt;string #u8(#xCE #xBB #xFE #xCE #xB7) 0 5
+             (error-handling-mode ignore))</code
+> ⇒ "λη"
+<code class="example-code">
+(utf8-&gt;string #u8(#xC0 80))</code
+> ⇒ <span class="special-result">exception</span>
+</pre>
+
 <div class="feature">
 <span class="category">(srfi 281 unicode)<br>procedure</span>
 <code class="signature">(<a id="utf16-to-string" href="#utf16-to-string">utf16-&gt;string</a>
@@ -1465,6 +1340,50 @@ present, <var>endianness</var> specifies the endianness of the encoding. If
 specifies the endianness of the encoding, and any
 BOM in the encoding is decoded as a regular character.
 </p>
+
+<pre
+><code class="example-code"
+>(utf16-&gt;string #u8(#xBB #x03)
+               (endianness little))</code> ⇒ "λ" ; U+3BB
+<code class="example-code"
+>(utf16-&gt;string #u8(#xBB #x03)
+               (endianness big))</code> ⇒ "묃" ; U+BB03
+<code class="example-code"
+>(utf16-&gt;string #u8(#xFF #xFE #xBB #x03)
+               (endianness little))</code
+>⇒ "λ"
+<code class="example-code"
+>(utf16-&gt;string #u8(#xFF #xFE #xBB #x03)
+               (endianness big))</code
+>⇒ "λ"
+<code class="example-code"
+>(utf16-&gt;string #u8(#xFF #xFE #xBB #x03)
+               (endianness little) #t)</code
+>⇒ "#\xFFFE;λ"
+<code class="example-code"
+>(utf16-&gt;string #u8(#xFF #xFE #xBB #x03)
+               (endianness big) #t)</code
+>⇒ "#\xFEFF;묃"
+<code class="example-code"
+>(utf16-&gt;string #u8(#xBB #x3 #xB1 #x3 #xBC
+                  #x3 #xB4 #x3 #xB1 #x3)
+               (endianness little) #f 0 6)</code
+>⇒ "λαμ"
+<code class="example-code"
+>(utf16-&gt;string #u8(#xBB #x3 #xB1 #x3 #xBC
+                  #x3 #xB4 #x3 #xB1 #x3)
+               (endianness little) #f 0 5)</code
+>⇒ <span class="special-result">exception</span>
+<code class="example-code"
+>(utf16-&gt;string #u8(#xBB #x3 #xB1 #x3 #xBC
+                  #x3 #xB4 #x3 #xB1 #x3)
+               (endianness little) #f 0 5
+               (error-handling-mode replace))</code
+>⇒ "λα\xFFFD;"
+
+<code class="example-code"
+>(utf16-&gt;string #u8(#xD8 #x80) (endianness big))</code
+> ⇒ <span class="special-result">exception</span></pre>
 
 <h4 id="encoding-procedures"><a href="#encoding-procedures"></a> Encoding procedures</h4>
 <div class="feature">
@@ -1519,35 +1438,11 @@ BOM in the encoding is decoded as a regular character.
 
 <p>
   An object that satisfies
-  <a href="#deserialization-errorp"><code>deserialization-error?</code></a>
-  necessarily satisfies
-  <a href="#deserialization-conditionp"><code>deserialization-condition?</code></a>
-  and
-  <a href="#string-range-conditionp"><code>string-range-condition?</code></a>.
-  An object that satisfies
   <a href="#unicode-decoding-errorp"><code>unicode-decoding-error?</code></a>
   necessarily satisfies
   <a href="#unicode-decoding-conditionp"><code>unicode-decoding-condition?</code></a>
   and
   <a href="#bytevector-range-conditionp"><code>bytevector-range-condition?</code></a>.
-</p>
-
-<div class="feature">
-<span class="category">(srfi 281 condition)</span><br>
-<span class="category">condition type</span>
-<code class="signature"><a id="deserialization-condition" href="#deserialization-condition">&amp;deserialization-condition</a></code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="deserialization-conditionp"
-                            href="#deserialization-conditionp"
-                        >deserialization-condition?</a> <var>obj</var>)</code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="make-deserialization-condition"
-                            href="#make-deserialization-condition"
-                        >make-deserialization-condition</a>)</code><br>
-</div>
-
-<p>
-  Condition object for conditions related to deserialization.
 </p>
 
 <div class="feature">
@@ -1568,32 +1463,6 @@ BOM in the encoding is decoded as a regular character.
 <p>
   Condition object for conditions related to Unicode decoding.
 </p>
-
-<div class="feature">
-<span class="category">(srfi 281 condition)</span><br>
-<span class="category">condition type</span>
-<code class="signature"><a id="string-range-condition"
-                           href="#string-range-condition">&amp;string-range-condition</a></code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="string-range-conditionp" href="#string-range-conditionp"
-                        >string-range-condition?</a> <var>obj</var>)</code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="make-string-range-condition"
-                           href="#make-string-range-condition">make-string-range-condition</a
-                           > <var>string</var> <var>start</var> <var>end</var>)</code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="string-range-condition-string"
-                           href="#string-range-condition-string">string-range-condition-string</a
-                           > <var>e</var>)</code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="string-range-condition-start"
-                           href="#string-range-condition-start">string-range-condition-start</a
-                           > <var>e</var>)</code><br>
-<span class="category">procedure</span>
-<code class="signature">(<a id="string-range-condition-end"
-                           href="#string-range-condition-start">string-range-condition-end</a
-                           > <var>e</var>)</code><br>
-</div>
 
 <p>
   Condition relating to a range in a string.
@@ -1626,6 +1495,29 @@ BOM in the encoding is decoded as a regular character.
 </div>
 <p>
   Condition relating to a range in a bytevector.
+</p>
+
+<h3 id="r6rs-library"><a href="#r6rs-library"></a> <span class="report-name">R<sup>6</sup>RS</span> compatibility library</h3>
+
+<p>
+  The <code>(srfi 281 r6rs)</code> library should be supplied. It exports all identifiers
+  defined in the <code>(rnrs bytevectors)</code> library, as described in the
+  <span class="report-name">R<sup>6</sup>RS</span>. Each identifier exported from this
+  library is <em>compatible</em> with the <span class="report-name">R<sup>6</sup>RS</span>,
+  in the following way: if the use of some procedure or syntax does not raise an exception of
+  type <code>&amp;violation</code>, then the use behaves as described in the
+  <span class="report-name">R<sup>6</sup>RS</span>. This means that
+</p>
+
+<ul>
+  <li>The <code>bytevector-copy!</code> procedure has a different argument order, and
+      a different interpretation of the arguments.</li>
+  <li>The default mode for the Unicode decoders is <code>raise</code>.</li>
+</ul>
+
+<p>
+  Procedures exported from this library should implementations described in
+  this SRFI, to the extent that they do not conflict with compatibility.
 </p>
 
 <h2 id="implementation"><a href="#implementation"></a> Implementation</h2>
@@ -1678,7 +1570,7 @@ BOM in the encoding is decoded as a regular character.
 <h2 id="acknowledgements"><a href="#acknowledgements"></a> Acknowledgements</h2>
 
 <p>
-  Daphne Preston-Kendal discovered and fixed some of the issues with integrating
+  Daphne Preston-Kendal discovered some of the issues with integrating
   <code>(rnrs bytevectors (6))</code> into <span
   class="report-name">R<sup>7</sup>RS</span> Large.
 </p>
@@ -1686,12 +1578,6 @@ BOM in the encoding is decoded as a regular character.
 <p>
   The <span class="report-name">R<sup>6</sup>RS</span> editors did most of
   the work specifying the library.
-</p>
-
-<p>
-  Daphne Preston-Kendal, John Cowan, and  Wolfgang Corcoran-Mathe
-  worked on SRFI 207, which has had some of its procedures adapted to
-  this SRFI.
 </p>
 
 <h2 id="appendix-1" data-toc><a href="#appendix-1"></a> Appendix 1:
@@ -1716,24 +1602,12 @@ Library summaries</h2>
 <code>bytevector</code><sup>7</sup>
 <code><a href="#bytevectoreqp">bytevector=?</a></code>
 <code>bytevector-copy</code><sup>7</sup>
+<code>bytevector-copy!</code><sup>7</sup>
 </p>
 
 <h3 id="srfi-281-endianness"><code>(srfi 281 endianness)</code></h3>
 <p class="never-break-inside">
 <code><a href="#endianness">endianness</a></code><sup>6</sup>
-</p>
-
-<h3 id="srfi-281-serialization"><code>(srfi 281 serialization)</code></h3>
-<p class="never-break-inside">
-<code><a href="#deserialization-errorp">deserialization-error?</a></code>
-<code><a href="#deserialization-error-string">deserialization-error-string</a></code>
-<code><a href="#deserialization-error-start">deserialization-error-start</a></code>
-<code><a href="#deserialization-error-end">deserialization-error-end</a></code>
-<code><a href="#deserialization-error-message">deserialization-error-message</a></code>
-<code><a href="#bytevector-to-hex-string">bytevector-&gt;hex-string</a></code>
-<code><a href="#hex-string-to-bytevector">hex-string-&gt;bytevector</a></code>
-<code><a href="#bytevector-to-base64">bytevector-&gt;base64</a></code>
-<code><a href="#base64-to-bytevector">base64-&gt;bytevector</a></code>
 </p>
 
 <h3 id="srfi-281-u8"><code>(srfi 281 u8)</code></h3>
@@ -1854,6 +1728,19 @@ Library summaries</h2>
 <code><a href="#string-to-utf8">string-&gt;utf8</a></code>
 <code><a href="#string-to-utf16">string-&gt;utf16</a></code>
 <code><a href="#string-to-utf32">string-&gt;utf32</a></code>
+</p>
+
+<h3 id="srfi-281-condition"><code>(srfi 281 condition)</code></h3>
+<p class="never-break-inside">
+<code><a href="#unicode-decoding-condition">&amp;unicode-decoding-condition</a></code>
+<code><a href="#unicode-decoding-conditionp">unicode-decoding-condition?</a></code>
+<code><a href="#make-unicode-decoding-condition">make-unicode-decoding-condition</a></code>
+<code><a href="#bytevector-range-condition">&amp;bytevector-range-condition</a></code>
+<code><a href="#bytevector-range-conditionp">bytevector-range-condition?</a></code>
+<code><a href="#make-bytevector-range-condition">make-bytevector-range-condition</a></code>
+<code><a href="#bytevector-range-condition-bytevector">bytevector-range-condition-bytevector</a></code>
+<code><a href="#bytevector-range-condition-start">bytevector-range-condition-start</a></code>
+<code><a href="#bytevector-range-condition-end">bytevector-range-condition-end</a></code>
 </p>
 
 <h2 id="copyright"><a href="#copyright"></a> Copyright</h2>

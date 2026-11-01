@@ -18,7 +18,8 @@
         (srfi 194)
         (rename (srfi 252)
                 (test-property %test-property))
-        (srfi 281))
+        (srfi 281)
+        (prefix (srfi 281 r6rs) r6rs:))
 
 (include "prelude.scm")
 (test-begin "SRFI 281")
@@ -47,7 +48,6 @@
 
 (include "u8-list-to-bytevector.scm")
 (test-u8-list->bytevector-and-bytevector->u8-list)
-(test-u8-list-r6rs-examples)
 
 (include "s8.scm")
 (test-bytevector-s8-ref-negative)
@@ -71,42 +71,58 @@
 (test-bytevector->sint-list-and-sint-list->bytevector-inverses)
 (set! skip-current-tests? #f)
 
+(include "fixed-property.scm")
+(include "u16.scm")
 (when skip-big-tests?
   (set! skip-current-tests? #t))
-(include "u16.scm")
 (bytevector-u16-big-exhaustive)
 (bytevector-u16-little-exhaustive)
+(set! skip-current-tests? #f)
+(test-fixed-property "u16" 2 #f
+                     bytevector-u16-ref
+                     bytevector-u16-set!)
+(test-native-fixed-property "u16 native" 2 #f
+                            bytevector-u16-native-ref
+                            bytevector-u16-native-set!)
+
 (include "s16.scm")
+(when skip-big-tests?
+  (set! skip-current-tests? #t))
 (bytevector-s16-big-exhaustive)
 (bytevector-s16-little-exhaustive)
 (set! skip-current-tests? #f)
+(test-fixed-property "s16" 2 #t
+                     bytevector-s16-ref
+                     bytevector-s16-set!)
+(test-native-fixed-property "s16 native" 2 #t
+                            bytevector-s16-native-ref
+                            bytevector-s16-native-set!)
 
-(include "u32.scm")
-(test-u32-property)
-(include "s32.scm")
-(test-s32-property)
+(test-fixed-property "u32" 4 #f
+                     bytevector-u32-ref
+                     bytevector-u32-set!)
+(test-native-fixed-property "u32 native" 4 #f
+                            bytevector-u32-native-ref
+                            bytevector-u32-native-set!)
+(test-fixed-property "s32" 4 #t
+                     bytevector-s32-ref
+                     bytevector-s32-set!)
+(test-native-fixed-property "s32 native" 4 #t
+                            bytevector-s32-native-ref
+                            bytevector-s32-native-set!)
 
-(include "u64.scm")
-(test-u64-property)
-(include "s64.scm")
-(test-s64-property)
-
-(include "bytevector-to-hex-string.scm")
-(test-bytevector->hex-string)
-(include "hex-string-to-bytevector.scm")
-(test-hex-string->bytevector)
-
-(include "hex-string-to-bytevector-inversion.scm")
-(test-hex-string->bytevector-and-bytevector->hex-string-1)
-(test-hex-string->bytevector-and-bytevector->hex-string-2)
-
-(include "bytevector-to-base64.scm")
-(test-bytevector->base64)
-(include "base64-to-bytevector.scm")
-(test-base64->bytevector)
-(test-base64->bytevector-start-end)
-(include "bytevector-base64-inverse.scm")
-(test-bytevector->base64-and-base64->bytevector-inverses)
+(test-fixed-property "u64" 8 #f
+                     bytevector-u64-ref
+                     bytevector-u64-set!)
+(test-native-fixed-property "u64 native" 8 #f
+                            bytevector-u64-native-ref
+                            bytevector-u64-native-set!)
+(test-fixed-property "s64" 8 #t
+                     bytevector-s64-ref
+                     bytevector-s64-set!)
+(test-native-fixed-property "s64 native" 8 #t
+                            bytevector-s64-native-ref
+                            bytevector-s64-native-set!)
 
 (include "binary32.scm")
 (test-binary32)
@@ -153,5 +169,18 @@
 
 (string->utf32-and-utf32->string-inverses)
 (test-utf32-bom)
+
+(include "r6rs-examples.scm")
+(test-u8-list-r6rs-examples)
+(test-u8-s8-r6rs-example-1)
+(test-u8-s8-r6rs-example-2)
+(test-r6rs-uint-sint-examples)
+(test-r6rs-u16-examples)
+(test-r6rs-u32-examples)
+(test-r6rs-u64-examples)
+
+(include "r6rs.scm")
+(test-r6rs-utf8->string)
+(test-r6rs-bytevector-copy!)
 
 (test-end "SRFI 281")
