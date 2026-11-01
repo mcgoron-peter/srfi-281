@@ -239,7 +239,7 @@
                     (bytevector-length bv)))
     ((bv endianness endianness-mandatory? start end)
      (utf16->string bv endianness endianness-mandatory? start
-                    (bytevector-length bv)
+                    end
                     'raise))
     ((bv endianness endianness-mandatory? start end error-handling-mode)
      (unless (bytevector? bv)
@@ -290,8 +290,12 @@
               (define (read-word i)
                 (bytevector-u16-ref bv i endianness))
               (define (read-first-word i)
-                (if (= i end)
-                    (get-output-string port)
+                (cond
+                  ((= i end) (get-output-string port))
+                  ((not (can-read-16? i end))
+                   (handle-error start i "truncated pair")
+                   (get-output-string port))
+                  (else
                     (let ((word (read-word i)))
                       (cond
                         ((fx<=? #xD800 word #xDBFF)
@@ -301,7 +305,7 @@
                          (read-first-word (+ i 2)))
                         (else
                          (write-char (integer->char word) port)
-                         (read-first-word (+ i 2)))))))
+                         (read-first-word (+ i 2))))))))
               (define (read-surrogate-pair low start)
                 (let ((i (+ start 2)))
                   (if (not (can-read-16? i end))
@@ -441,7 +445,7 @@
                     (bytevector-length bv)))
     ((bv endianness endianness-mandatory? start end)
      (utf32->string bv endianness endianness-mandatory? start
-                    (bytevector-length bv)
+                    end
                     'raise))
     ((bv endianness endianness-mandatory? start end error-handling-mode)
      (unless (bytevector? bv)

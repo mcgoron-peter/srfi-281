@@ -18,7 +18,8 @@
         (srfi 194)
         (rename (srfi 252)
                 (test-property %test-property))
-        (srfi 281))
+        (srfi 281)
+        (prefix (srfi 281 r6rs) r6rs:))
 
 (include "prelude.scm")
 (test-begin "SRFI 281")
@@ -123,23 +124,6 @@
                             bytevector-s64-native-ref
                             bytevector-s64-native-set!)
 
-(include "bytevector-to-hex-string.scm")
-(test-bytevector->hex-string)
-(include "hex-string-to-bytevector.scm")
-(test-hex-string->bytevector)
-
-(include "hex-string-to-bytevector-inversion.scm")
-(test-hex-string->bytevector-and-bytevector->hex-string-1)
-(test-hex-string->bytevector-and-bytevector->hex-string-2)
-
-(include "bytevector-to-base64.scm")
-(test-bytevector->base64)
-(include "base64-to-bytevector.scm")
-(test-base64->bytevector)
-(test-base64->bytevector-start-end)
-(include "bytevector-base64-inverse.scm")
-(test-bytevector->base64-and-base64->bytevector-inverses)
-
 (include "binary32.scm")
 (test-binary32)
 (test-binary32-native)
@@ -194,5 +178,9 @@
 (test-r6rs-u16-examples)
 (test-r6rs-u32-examples)
 (test-r6rs-u64-examples)
+
+(include "r6rs.scm")
+(test-r6rs-utf8->string)
+(test-r6rs-bytevector-copy!)
 
 (test-end "SRFI 281")

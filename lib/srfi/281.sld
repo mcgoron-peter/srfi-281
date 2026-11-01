@@ -3,21 +3,14 @@
 ; SPDX-License-Identifier: MIT
 
 (define-library (srfi 281)
-  (import (srfi 281 base) (srfi 281 u8) (srfi 281 serialization))
+  (import (srfi 281 base) (srfi 281 u8))
   (export endianness? native-endianness
           bytevector bytevector? make-bytevector bytevector-fill!
           bytevector-length
           bytevector=?
-          bytevector-copy
+          bytevector-copy bytevector-copy!
           bytevector-u8-ref bytevector-u8-set!
-          u8-list->bytevector bytevector->u8-list
-          deserialization-error?
-          deserialization-error-string
-          deserialization-error-start
-          deserialization-error-end
-          deserialization-error-message
-          bytevector->hex-string hex-string->bytevector
-          bytevector->base64 base64->bytevector)
+          u8-list->bytevector bytevector->u8-list)
   (cond-expand
     ((or gauche chicken chibi (library (srfi 281 endianness)))
      (import (srfi 281 endianness))
@@ -111,18 +104,9 @@
   (cond-expand
     ((library (rnrs conditions))
      (import (srfi 281 condition))
-     (export &deserialization-condition
-             make-deserialization-condition
-             deserialization-condition?
-             &unicode-decoding-condition
+     (export &unicode-decoding-condition
              make-unicode-decoding-condition
              unicode-decoding-condition?
-             &string-range-condition
-             make-string-range-condition
-             string-range-condition?
-             string-range-condition-start
-             string-range-condition-end
-             string-range-condition-string
              &bytevector-range-condition
              bytevector-range-condition?
              bytevector-range-condition-start
