@@ -13,7 +13,6 @@
   (export endianness? native-endianness make-bytevector bytevector
           bytevector-length bytevector-u8-ref bytevector-u8-set!
           bytevector=? bytevector-fill! endianness
-          bytevector->hex-string hex-string->bytevector
           deserialization-error?
           deserialization-error-message
           deserialization-error-string
@@ -235,130 +234,6 @@ C_return(0);")))
            (if (member str '("little" "big"))
                `(,(rename 'quote) ,sym)
                (error "unknown endianness" sym))))))
-
-    (: bytevector->hex-string (bytevector #!optional fixnum fixnum
-                               -> string))
-    (define bytevector->hex-string
-      (let ((%bytevector->hex-string
-             (foreign-lambda* scheme-object ((nonnull-bytevector bv)
-                                             (size_t start)
-                                             (size_t end)
-                                             (scheme-object strobj))
-        "\
-char *str = C_data_pointer(C_block_item(strobj, 0));
-bv += start;
-for (; start < end; start++) {
-  *str++ = \"0123456789ABCDEF\"[(*bv >> 4) & 0xF];
-  *str++ = \"0123456789ABCDEF\"[*bv++ & 0xF];
-};
-C_return(strobj);")))
-      (lambda (bv #!optional (start 0) (end #f))
-        (check! bytevector? bv 'bytevector->hex-string "bytevector")
-        (let* ((size (##sys#size bv))
-               (end (or end size)))
-          (unless-unsafe-and
-              (and (fixnum? start) (fixnum? end)
-                   (fx<= 0 start)
-                   (fx<= start end) (fx<= end size))
-            (raise-bounds-error 'bytevector->hex-string (list bv start end)))
-          (%bytevector->hex-string bv
-                                   start
-                                   end
-                                   (make-string (fx* (fx- end start) 2)))))))
-
-    (define deserialization-error?
-      (let ((p1 (condition-predicate 'deserialization))
-            (p2 (condition-predicate 'exn)))
-        (lambda (x) (and (p1 x) (p2 x)))))
-    (define deserialization-error-message
-      (condition-property-accessor 'exn 'message))
-    (define deserialization-error-string
-      (condition-property-accessor 'deserialization 'string))
-    (define deserialization-error-start
-      (condition-property-accessor 'deserialization 'start))
-    (define deserialization-error-end
-      (condition-property-accessor 'deserialization 'end))
-
-(foreign-declare "\
-static inline int hex_char_to_half(char c)
-{
-	switch (c) {
-	case '0': return 0;
-	case '1': return 1;
-	case '2': return 2;
-	case '3': return 3;
-	case '4': return 4;
-	case '5': return 5;
-	case '6': return 6;
-	case '7': return 7;
-	case '8': return 8;
-	case '9': return 9;
-	case 'a': case 'A': return 10;
-	case 'b': case 'B': return 11;
-	case 'c': case 'C': return 12;
-	case 'd': case 'D': return 13;
-	case 'e': case 'E': return 14;
-	case 'f': case 'F': return 15;
-	default: return -1;
-	}
-}
-")
-
-    (: hex-string->bytevector (string #!optional fixnum fixnum
-                               -> bytevector))
-    (define hex-string->bytevector
-      (let ((%hex-string->bytevector
-             (foreign-lambda* scheme-object ((scheme-object strobj)
-                                             (size_t start_char)
-                                             (size_t number_of_chars)
-                                             (nonnull-bytevector output))
-        "\
-char c1, c2;
-int tmp;
-size_t start = C_unfix(C_utf_position(strobj, C_fix(start_char)));
-char *buf = C_data_pointer(C_block_item(strobj, 0)) + start;
-
-for (start = 0; start < number_of_chars; start += 2, buf += 2, output++) {
-  c1 = buf[0];
-  c2 = buf[1];
-
-  tmp = hex_char_to_half(c1);
-  if (tmp < 0) {
-    C_return(C_fix(start));
-  }
-
-  *output = (unsigned char) tmp;
-
-  tmp = hex_char_to_half(c2);
-  if (tmp < 0) {
-    C_return(C_fix(start));
-  }
-
-  *output = (*output << 4) | (unsigned char) tmp;
-}
-
-C_return(C_SCHEME_FALSE);")))
-      (lambda (str #!optional (start 0) (end (string-length str)))
-        (unless-unsafe-and
-            (and (fixnum? start) (fixnum? end)
-                 (fx<= 0 start)
-                 (fx<= start end)
-                 (fx<= end (string-length str)))
-          (raise-bounds-error 'hex-string->bytevector (list str start end)))
-        (unless-unsafe-and (fx= 0 (fxrem (fx- end start) 2))
-          (raise (condition `(exn location hex-string->bytevector
-                                  message "Invalid length for hex string segment"
-                                  arguments (,start ,end)))))
-        (let* ((bv (make-bytevector (fx/ (fx- end start) 2)))
-               (bad-index (%hex-string->bytevector str start (fx- end start) bv)))
-          (when bad-index
-            (raise (condition `(exn location hex-string->bytevector
-                                    message "invalid character in hex string"
-                                    arguments (,str ,bad-index))
-                              `(deserialization string ,str
-                                                start ,bad-index
-                                                end ,(fx+ bad-index 1)))))
-          bv))))
 
     (: u8-list->bytevector
        ((list-of fixnum) #!optional
