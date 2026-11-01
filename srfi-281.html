@@ -235,10 +235,9 @@ Library summaries</a></li>
 </p>
 
 <ol>
-<li>The <code>bytevector-copy!</code> procedure is not defined in this SRFI.</li>
-<li>The <code>bytevector-copy</code> procedure is specified to be the
-    same one as the <span class="report-name">R<sup>7</sup>RS</span>
-    procedure.</li>
+<li>The <code>bytevector-copy</code> and <code>bytevector-copy!</code>
+    procedure is specified to be the same one as the <span
+    class="report-name">R<sup>7</sup>RS</span> procedure.</li>
 <li>The Unicode encoding/decoding procedures and procedures that convert
     to and from lists are extended to take
     <var>start</var> and <var>end</var> arguments in a similar way to the
@@ -246,6 +245,8 @@ Library summaries</a></li>
 <li>The Unicode decoding procedures are required to raise exceptions when
     invalid data is encountered. An extra argument can control what the
     decoder does.</li>
+<li>The <span class="report-name">R<sup>6</sup>RS</span> versions are
+    exported by a compatibility library <code>(srfi 281 r6rs)</code>.</li>
 </ol>
 
 <p>
@@ -304,7 +305,7 @@ Library summaries</a></li>
 
 <p>
   If one specifically wants the <span class="report-name">R<sup>6</sup>RS</span>
-  procedures, one can import <code>(rnrs bytevectors)</code>.
+  procedures, one can import <code>(srfi 281 r6rs)</code>.
 </p>
 
 
@@ -1607,6 +1608,7 @@ Library summaries</h2>
 <code>bytevector</code><sup>7</sup>
 <code><a href="#bytevectoreqp">bytevector=?</a></code>
 <code>bytevector-copy</code><sup>7</sup>
+<code>bytevector-copy!</code><sup>7</sup>
 </p>
 
 <h3 id="srfi-281-endianness"><code>(srfi 281 endianness)</code></h3>
