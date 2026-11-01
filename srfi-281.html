@@ -769,9 +769,9 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 >(bytevector-sint-ref b 0 (endianness little) 16)</code> ⇒ -3
 <code class="example-code">(bytevector->u8-list b)</code
 > ⇒ (253 255 255 255
-<code class="example-code"></code>     255 255 255 255
-<code class="example-code"></code>     255 255 255 255
-<code class="example-code"></code>     255 255 255 255)
+<code class="example-code"> </code>    255 255 255 255
+<code class="example-code"> </code>    255 255 255 255
+<code class="example-code"> </code>    255 255 255 255)
 (bytevector-uint-set! b 0 (- (expt 2 128) 3) (endianness big) 16)
 <code class="example-code"
 >(bytevector-uint-ref b 0 (endianness big) 16)</code
@@ -782,9 +782,9 @@ Only the name of ⟨<var>endianness symbol</var>⟩ is significant.
 <code class="example-code"
 >(bytevector->u8-list b)</code
 >⇒ (255 255 255 255
-<code class="example-code"></code>    255 255 255 255
-<code class="example-code"></code>    255 255 255 255
-<code class="example-code"></code>    255 255 255 253)
+<code class="example-code"> </code>   255 255 255 255
+<code class="example-code"> </code>   255 255 255 255
+<code class="example-code"> </code>   255 255 255 253)
 </pre>
 
 <h3 id="multibyte-libraries"><a href="#multibyte-libraries"></a> Multibyte libraries</h3>
